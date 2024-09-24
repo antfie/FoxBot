@@ -26,7 +26,7 @@ Premium features:
 
 - Monitoring share prices with buy/sell notifications
 
-Need custom integrations? email foxbot@antfie.com. 
+Need custom features or integrations? email foxbot@antfie.com. 
 
 # Contributing
 
