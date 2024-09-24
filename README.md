@@ -1,6 +1,6 @@
 # FoxBot
 
-If a fox was a robot it would be fantastic. This is your very own personal robot, because you are fantastic. FoxBot is your AI-free personal assistant, dilligantly doing your chores in the background and letting you know about things important to you.
+If a fox was a robot it would be fantastic. This is your very own personal robot, because you are fantastic. FoxBot is your AI-free personal assistant, diligently doing your chores in the background and letting you know about things important to you.
 
 ## What can it do?
 
