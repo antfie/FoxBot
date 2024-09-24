@@ -17,6 +17,9 @@ import (
 //go:embed config.yaml
 var defaultConfigData []byte
 
+//goland:noinspection GoUnnecessarilyExportedIdentifiers
+var AppVersion = "0.0"
+
 func main() {
 	defer func() {
 		if r := recover(); r != nil {
@@ -26,6 +29,8 @@ func main() {
 			log.Printf("Main panic recovered: %v\nStack trace:\n%s", r, stackTrace)
 		}
 	}()
+
+	print(fmt.Sprintf("FoxBot version %s\nCopyright © Anthony Fielding, Inc. 2024. All Rights Reserved.\n", AppVersion))
 
 	c := config.Load(defaultConfigData)
 	task := &tasks.Context{

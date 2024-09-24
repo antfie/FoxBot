@@ -5,3 +5,4 @@ coverage.html
 data.db
 .private
 .idea
+dist
