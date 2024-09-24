@@ -24,7 +24,7 @@ You can run this wherever you like.
 
 Premium features:
 
-- Monitoring shares
+- Monitoring share prices with buy/sell notifications
 
 Need custom integrations? email foxbot@antfie.com. 
 
