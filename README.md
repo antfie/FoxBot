@@ -1,22 +1,22 @@
 ![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/antfie/FoxBot)
 ![GitHub License](https://img.shields.io/github/license/antfie/FoxBot)
 
-# FoxBot
+# Introducing FoxBot
 
 If a fox was a robot it would be fantastic. This is your very own personal robot, because you are fantastic. FoxBot is your AI-free personal assistant, diligently doing your chores in the background and letting you know about things important to you.
 
-## What can it do?
+## What Can It Do?
 
 * Poll your RSS feeds and notify you of relvent topics
 * Detect changes to websites you care about
 * Daily reminders throughout the day about things to be mindful of, like drinking water
-* Countdowns
+* Countdown timers
 
-## How can I support this?
+## How Can I Support This?
 
-Donate button here
+We welcome fixes, features and financial support.
 
-## Running
+## Running It
 
 You can run this wherever you like.
 
@@ -32,4 +32,4 @@ Need custom integrations? email foxbot@antfie.com.
 
 # Credits
 
-Alert sounds by [Material Design](https://m2.material.io/design/sound/sound-resources.html) (Google), which are licenced under [CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/legalcode).
+FotBot was created by Anrthony Fielding. Alert sounds by [Material Design](https://m2.material.io/design/sound/sound-resources.html) (Google), which are licenced under [CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/legalcode).
