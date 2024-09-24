@@ -1,0 +1,59 @@
+db_path: data.db
+
+output:
+  # Do you want to see notifications in the console?
+  console: true
+
+  # Do you want notifications via Slack?
+  slack:
+    token: xoxb-not-a-real-token-this-will-not-work
+    channel_id: 000
+
+# Enable this for inspiration to help you keep your goals on track
+reminders:
+  check:
+    frequency: hourly
+    from: 08:00
+    to: 17:00
+  reminders:
+    - What are you grateful for? 🧘
+    - Are you living and having fun? 🤩
+    - Be content with what you have today 😆
+    - You are 100% where you want to be right now 🎯
+    - Take time away from the keyboard ⛰️
+
+# Do you want to time some things?
+countdown:
+  check:
+    frequency: hourly
+    from: 08:00
+    to: 17:00
+  timers:
+  - name: New Year
+    date: 01/01/2025
+
+# Check your RSS feeds
+rss:
+  check:
+    frequency: half_hourly
+  important_keywords:
+    - FoxBot
+  feeds:
+  - group: BBC
+    html:
+        tag: main
+        important_keywords:
+          - breaking news story
+        ignore_url_signatures:
+          - /play/
+          - /iplayer/
+    important_keywords:
+      - BREAKING
+    ignore_url_signatures:
+      - /sport/
+    feeds:
+    - name: Main
+      url: https://feeds.bbci.co.uk/news/rss.xml
+  - feeds:
+      - name: xkcd
+        url: https://xkcd.com/rss.xml
