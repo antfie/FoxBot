@@ -21,12 +21,7 @@ func NewDB(dbPath string) *DB {
 		log.Panic(err)
 	}
 
-	//db.SetMaxOpenConns(1)
 	runMigrations(db)
-
-	if err != nil {
-		log.Panic(err)
-	}
 
 	return &DB{db: db}
 }
