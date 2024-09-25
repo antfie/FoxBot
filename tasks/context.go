@@ -1,8 +1,8 @@
 package tasks
 
 import (
-	"foxbot/db"
-	"foxbot/types"
+	"github.com/antfie/FoxBot/db"
+	"github.com/antfie/FoxBot/types"
 )
 
 type Context struct {

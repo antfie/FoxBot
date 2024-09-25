@@ -3,9 +3,9 @@ package tasks
 import (
 	"encoding/xml"
 	"fmt"
-	"foxbot/types"
-	"foxbot/utils"
 	"github.com/PuerkitoBio/goquery"
+	"github.com/antfie/FoxBot/types"
+	"github.com/antfie/FoxBot/utils"
 	"io"
 	"log"
 	"net/http"

@@ -3,10 +3,10 @@ package main
 import (
 	_ "embed"
 	"fmt"
-	"foxbot/config"
-	"foxbot/db"
-	"foxbot/tasks"
-	"foxbot/utils"
+	"github.com/antfie/FoxBot/config"
+	"github.com/antfie/FoxBot/db"
+	"github.com/antfie/FoxBot/tasks"
+	"github.com/antfie/FoxBot/utils"
 	"log"
 	"os"
 	"os/signal"
@@ -30,7 +30,7 @@ func main() {
 		}
 	}()
 
-	print(fmt.Sprintf("FoxBot version %s\nCopyright © Anthony Fielding, Inc. 2024. All Rights Reserved.\n", AppVersion))
+	print(fmt.Sprintf("FoxBot version %s\n", AppVersion))
 
 	c := config.Load(defaultConfigData)
 	task := &tasks.Context{

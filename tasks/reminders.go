@@ -2,7 +2,7 @@ package tasks
 
 import (
 	"fmt"
-	"foxbot/utils"
+	"github.com/antfie/FoxBot/utils"
 	"time"
 )
 

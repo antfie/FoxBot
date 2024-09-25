@@ -5,7 +5,7 @@ import (
 	"log"
 	"sync"
 
-	_ "modernc.org/sqlite"
+	_ "github.com/mattn/go-sqlite3"
 )
 
 type DB struct {
@@ -14,7 +14,12 @@ type DB struct {
 }
 
 func NewDB(dbPath string) *DB {
-	db, err := sql.Open("sqlite", dbPath)
+	db, err := sql.Open("sqlite3", dbPath)
+
+	if err != nil {
+		log.Panic(err)
+	}
+
 	//db.SetMaxOpenConns(1)
 	runMigrations(db)
 

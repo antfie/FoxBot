@@ -2,7 +2,7 @@ package utils
 
 import (
 	"fmt"
-	"foxbot/types"
+	"github.com/antfie/FoxBot/types"
 	"log"
 	"net/url"
 	"strings"
@@ -15,6 +15,10 @@ var slackHeaders = map[string]string{
 }
 
 func NotifySlack(creds *types.Slack, message string) {
+	sendMessage(creds, message)
+}
+
+func sendMessage(creds *types.Slack, message string) {
 	form := url.Values{}
 	form.Add("text", message)
 

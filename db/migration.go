@@ -36,20 +36,20 @@ func runMigrations(db *sql.DB) {
 
 		// Is this the first migration?
 		if currentMigration == 1 {
-			_, err = tx.Query("CREATE TABLE migration (version INTEGER PRIMARY KEY)")
+			_, err := tx.Exec("CREATE TABLE migration (version INTEGER PRIMARY KEY)")
 
 			if err != nil {
 				log.Fatal(err)
 			}
 		}
 
-		_, err = tx.Query(string(data))
+		_, err = tx.Exec(string(data))
 
 		if err != nil {
 			log.Fatal(err)
 		}
 
-		_, err = tx.Query("INSERT INTO migration (version) VALUES (?)", currentMigration)
+		_, err = tx.Exec("INSERT INTO migration (version) VALUES (?)", currentMigration)
 
 		if err != nil {
 			log.Fatal(err)
@@ -64,47 +64,17 @@ func runMigrations(db *sql.DB) {
 }
 
 func getDbMigrationVersion(db *sql.DB) int {
-	rows, err := db.Query("SELECT 1 FROM sqlite_schema WHERE type='table' AND name='migration' LIMIT 1")
+	row := db.QueryRow("SELECT version FROM migration ORDER BY version DESC LIMIT 1")
 
-	if err != nil {
-		log.Panic(err)
-	}
-
-	found := rows.Next()
-
-	err = rows.Close()
-
-	if err != nil {
-		log.Panic(err)
-	}
-
-	if !found {
-		return 0
-	}
-
-	rows, err = db.Query("SELECT version FROM migration ORDER BY version DESC LIMIT 1")
-
-	if err != nil {
-		log.Panic(err)
-	}
-
-	found = rows.Next()
-
-	if !found {
+	if row.Err() != nil {
 		return 0
 	}
 
 	currentMigration := 0
-	err = rows.Scan(&currentMigration)
+	err := row.Scan(&currentMigration)
 
 	if err != nil {
-		log.Panic(err)
-	}
-
-	err = rows.Close()
-
-	if err != nil {
-		log.Panic(err)
+		return 0
 	}
 
 	return currentMigration

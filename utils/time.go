@@ -2,7 +2,7 @@ package utils
 
 import (
 	"fmt"
-	"foxbot/types"
+	"github.com/antfie/FoxBot/types"
 	"log"
 	"strings"
 	"time"

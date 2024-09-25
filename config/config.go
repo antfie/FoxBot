@@ -1,8 +1,8 @@
 package config
 
 import (
-	"foxbot/types"
-	"foxbot/utils"
+	"github.com/antfie/FoxBot/types"
+	"github.com/antfie/FoxBot/utils"
 	"gopkg.in/yaml.v3"
 	"log"
 	"os"

@@ -14,7 +14,7 @@ If a fox was a robot it would be fantastic. This is your very own personal robot
 
 ## How Can I Support This?
 
-We welcome fixes, features and financial support.
+We welcome fixes, features and donations.
 
 ## Running It
 

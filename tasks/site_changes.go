@@ -2,8 +2,8 @@ package tasks
 
 import (
 	"fmt"
-	"foxbot/types"
-	"foxbot/utils"
+	"github.com/antfie/FoxBot/types"
+	"github.com/antfie/FoxBot/utils"
 	"io"
 	"log"
 	"net/http"

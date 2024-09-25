@@ -1,6 +1,6 @@
 package tasks
 
-import "foxbot/utils"
+import "github.com/antfie/FoxBot/utils"
 
 func (c *Context) Notify(message string) {
 	if c.Config.Output.Console {
