@@ -36,13 +36,15 @@ We welcome contributions to the project.
 
 The following is a non-commital list of items we want to work through:
 
+- Document how to deploy to Raspberry Pi
+- Screenshots
+- Document the configuration file
 - Speed test functionality, ping, ICMP
 - Reduce noises and notifications at night when sleeping
 - Consider daily summaries instead of regular updates
-* Solar panel monitoring
-* Weather
-* Home automation?
-* Document how to deploy to Raspberry Pi
+- Solar panel monitoring
+- Weather
+- Home automation?
 
 # Credits
 
