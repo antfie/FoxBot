@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/antfie/FoxBot/config"
 	"github.com/antfie/FoxBot/db"
+	"github.com/antfie/FoxBot/slack"
 	"github.com/antfie/FoxBot/tasks"
 	"github.com/antfie/FoxBot/utils"
 	"log"
@@ -36,6 +37,10 @@ func main() {
 	task := &tasks.Context{
 		Config: c,
 		DB:     db.NewDB(c.DBPath),
+	}
+
+	if c.Output.Slack != nil {
+		task.Slack = slack.NewSlack(c.Output.Slack, task.DB)
 	}
 
 	var tasksToRun []*tasks.Task

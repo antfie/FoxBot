@@ -9,8 +9,9 @@ import (
 )
 
 type DB struct {
-	db *sql.DB
-	mu sync.Mutex
+	db      *sql.DB
+	mu      sync.Mutex
+	slackMu sync.Mutex
 }
 
 func NewDB(dbPath string) *DB {
@@ -84,4 +85,59 @@ func (db *DB) IsRSSLinkInDB(link string) bool {
 	}
 
 	return found
+}
+
+func (db *DB) QueueSlackNotification(message string) {
+	db.slackMu.Lock()
+	defer db.slackMu.Unlock()
+
+	_, err := db.db.Exec("INSERT INTO slack_notification(message) SELECT ? WHERE NOT EXISTS(SELECT 1 FROM slack_notification WHERE message = ?)", message, message)
+
+	if err != nil {
+		log.Panic(err)
+	}
+}
+
+func (db *DB) ConsumeSlackNotificationQueue() []string {
+	db.slackMu.Lock()
+	defer db.slackMu.Unlock()
+
+	var results []string
+
+	rows, err := db.db.Query("SELECT message FROM slack_notification")
+
+	if err != nil {
+		log.Panic(err)
+	}
+
+	for rows.Next() {
+		var value string
+		err = rows.Scan(&value)
+
+		if err != nil {
+			log.Panic(err)
+		}
+
+		results = append(results, value)
+	}
+
+	err = rows.Err()
+
+	if err != nil {
+		log.Panic(err)
+	}
+
+	err = rows.Close()
+
+	if err != nil {
+		log.Panic(err)
+	}
+
+	_, err = db.db.Exec("DELETE FROM slack_notification")
+
+	if err != nil {
+		log.Panic(err)
+	}
+
+	return results
 }

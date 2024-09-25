@@ -8,6 +8,6 @@ func (c *Context) Notify(message string) {
 	}
 
 	if c.Config.Output.Slack != nil {
-		utils.NotifySlack(c.Config.Output.Slack, message)
+		c.DB.QueueSlackNotification(message)
 	}
 }
