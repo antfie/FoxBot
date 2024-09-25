@@ -2,6 +2,7 @@ package db
 
 import (
 	"database/sql"
+	"github.com/antfie/FoxBot/utils"
 	"log"
 	"sync"
 
@@ -9,9 +10,8 @@ import (
 )
 
 type DB struct {
-	db      *sql.DB
-	mu      sync.Mutex
-	slackMu sync.Mutex
+	db *sql.DB
+	mu sync.Mutex
 }
 
 func NewDB(dbPath string) *DB {
@@ -45,6 +45,10 @@ func (db *DB) Insert(query string, args ...any) bool {
 	db.mu.Lock()
 	defer db.mu.Unlock()
 
+	return db.insert(query, args...)
+}
+
+func (db *DB) insert(query string, args ...any) bool {
 	result, err := db.db.Exec(query, args...)
 
 	if err != nil {
@@ -61,6 +65,9 @@ func (db *DB) Insert(query string, args ...any) bool {
 }
 
 func (db *DB) IsRSSLinkInDB(link string) bool {
+	db.mu.Lock()
+	defer db.mu.Unlock()
+
 	rows, err := db.db.Query("SELECT 1 FROM rss WHERE link = ? LIMIT 1", link)
 
 	if err != nil {
@@ -88,19 +95,19 @@ func (db *DB) IsRSSLinkInDB(link string) bool {
 }
 
 func (db *DB) QueueSlackNotification(message string) {
-	db.slackMu.Lock()
-	defer db.slackMu.Unlock()
+	db.mu.Lock()
+	defer db.mu.Unlock()
 
-	_, err := db.db.Exec("INSERT INTO slack_notification(message) SELECT ? WHERE NOT EXISTS(SELECT 1 FROM slack_notification WHERE message = ?)", message, message)
+	success := db.insert("INSERT INTO slack_notification(message) VALUES (?)", message)
 
-	if err != nil {
-		log.Panic(err)
+	if !success {
+		log.Panic("Could not queue slack notification")
 	}
 }
 
 func (db *DB) ConsumeSlackNotificationQueue() []string {
-	db.slackMu.Lock()
-	defer db.slackMu.Unlock()
+	db.mu.Lock()
+	defer db.mu.Unlock()
 
 	var results []string
 
@@ -118,7 +125,9 @@ func (db *DB) ConsumeSlackNotificationQueue() []string {
 			log.Panic(err)
 		}
 
-		results = append(results, value)
+		if !utils.IsStringInArray(value, results) {
+			results = append(results, value)
+		}
 	}
 
 	err = rows.Err()
