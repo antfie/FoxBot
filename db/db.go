@@ -41,13 +41,6 @@ func (db *DB) Query(query string, args ...any) *sql.Rows {
 	return rows
 }
 
-func (db *DB) Insert(query string, args ...any) bool {
-	db.mu.Lock()
-	defer db.mu.Unlock()
-
-	return db.insert(query, args...)
-}
-
 func (db *DB) insert(query string, args ...any) bool {
 	result, err := db.db.Exec(query, args...)
 
@@ -88,7 +81,7 @@ func (db *DB) IsRSSLinkInDB(link string) bool {
 	}
 
 	if !found {
-		db.Insert("INSERT INTO rss(link) VALUES (?)", link)
+		db.insert("INSERT INTO rss(link) VALUES (?)", link)
 	}
 
 	return found

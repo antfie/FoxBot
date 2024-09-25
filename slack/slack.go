@@ -41,7 +41,7 @@ func (s *Slack) processor() {
 		select {
 		case <-ticker.C:
 			messages := s.db.ConsumeSlackNotificationQueue()
-			
+
 			if len(messages) > 0 {
 				message := strings.Join(messages, "\n")
 				s.notify(message)
