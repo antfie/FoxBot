@@ -1,6 +1,6 @@
 ![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/antfie/FoxBot)
 ![GitHub License](https://img.shields.io/github/license/antfie/FoxBot)
-
+[![Go Report Card](https://goreportcard.com/badge/github.com/antfie/FoxBot)](https://goreportcard.com/report/github.com/antfie/FoxBot)
 # Introducing FoxBot
 
 If a fox was a robot it would be fantastic. This is your very own personal robot, because you are fantastic. FoxBot is your AI-free personal assistant, diligently doing your chores in the background and letting you know about things important to you.
