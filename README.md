@@ -30,6 +30,20 @@ Need custom features or integrations? email foxbot@antfie.com.
 
 # Contributing
 
+We welcome contributions to the project.
+
+# Backlog
+
+The following is a non-commital list of items we want to work through:
+
+- Speed test functionality, ping, ICMP
+- Reduce noises and notifications at night when sleeping
+- Consider daily summaries instead of regular updates
+* Solar panel monitoring
+* Weather
+* Home automation?
+* Document how to deploy to Raspberry Pi
+
 # Credits
 
 FotBot was created by Anrthony Fielding. Alert sounds by [Material Design](https://m2.material.io/design/sound/sound-resources.html) (Google), which are licenced under [CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/legalcode).
