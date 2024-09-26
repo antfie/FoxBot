@@ -8,6 +8,8 @@ output:
   slack:
     token: xoxb-not-a-real-token-this-will-not-work
     channel_id: 000
+    from: 08:00
+    to: 17:00
 
 # Enable this for inspiration to help you keep your goals on track
 reminders:

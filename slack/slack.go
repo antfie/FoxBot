@@ -12,8 +12,9 @@ import (
 )
 
 type Slack struct {
-	url string
-	db  *db.DB
+	url      string
+	db       *db.DB
+	duration *types.TimeDuration
 }
 
 var slackHeaders = map[string]string{
@@ -24,8 +25,9 @@ func NewSlack(config *types.Slack, db *db.DB) *Slack {
 	formattedUrl := fmt.Sprintf("https://slack.com/api/chat.postMessage?token=%s&channel=%s", config.Token, config.ChannelId)
 
 	slack := &Slack{
-		url: formattedUrl,
-		db:  db,
+		url:      formattedUrl,
+		db:       db,
+		duration: config.Duration,
 	}
 
 	go slack.processor()
@@ -40,6 +42,10 @@ func (s *Slack) processor() {
 	for {
 		select {
 		case <-ticker.C:
+			if s.duration != nil && !utils.IsWithinDuration(time.Now(), *s.duration) {
+				return
+			}
+
 			messages := s.db.ConsumeSlackNotificationQueue()
 
 			if len(messages) > 0 {

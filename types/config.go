@@ -17,4 +17,5 @@ type Output struct {
 type Slack struct {
 	Token     string
 	ChannelId string
+	Duration  *TimeDuration
 }
