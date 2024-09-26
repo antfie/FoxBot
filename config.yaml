@@ -1,18 +1,29 @@
+# This is the path to the sqlite3 database this app will use to store some data.
+# The DB  will be created if it doesn't exist i.e. on first-run.
 db_path: data.db
 
+# This section is all about where the notifications end up
 output:
   # Do you want to see notifications in the console?
   console: true
 
   # Do you want notifications via Slack?
+  # You can create your own Slack app (https://api.slack.com/docs/apps) to do this.
   slack:
+    # Set your Slack token here
     token: xoxb-not-a-real-token-this-will-not-work
+
+    # The channel ID to send notifications to
     channel_id: 000
+
+    # Only send notifications between these times.
+    # If you remove these settings notifications will not be queued up.
     from: 08:00
     to: 17:00
 
 # Enable this for inspiration to help you keep your goals on track
 reminders:
+  # How often to be reminded?
   check:
     frequency: hourly
     from: 08:00
@@ -26,6 +37,7 @@ reminders:
 
 # Do you want to time some things?
 countdown:
+  # How often to be notified of timer changes?
   check:
     frequency: hourly
     from: 08:00
@@ -36,8 +48,10 @@ countdown:
 
 # Check your RSS feeds
 rss:
+  # How often to check the feeds?
   check:
     frequency: half_hourly
+  # A list of important keywords to look for. These will be highlighted in the notifications
   important_keywords:
     - FoxBot
   feeds:

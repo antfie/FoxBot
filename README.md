@@ -1,6 +1,7 @@
 ![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/antfie/FoxBot)
 ![GitHub License](https://img.shields.io/github/license/antfie/FoxBot)
 [![Go Report Card](https://goreportcard.com/badge/github.com/antfie/FoxBot)](https://goreportcard.com/report/github.com/antfie/FoxBot)
+
 # Introducing FoxBot
 
 If a fox was a robot it would be fantastic. This is your very own personal robot, because you are fantastic. FoxBot is your AI-free personal assistant, diligently doing your chores in the background and letting you know about things important to you.
@@ -12,25 +13,23 @@ If a fox was a robot it would be fantastic. This is your very own personal robot
 * Daily reminders throughout the day about things to be mindful of, like drinking water
 * Countdown timers
 
+## How Do I Run It?
+
+You can run this wherever you like. Just download the appropriate binary from [here](https://github.com/antfie/FoxBot/releases/latest).
+
+## How Do I Configure It?
+
+There is a [config.yaml](https://github.com/antfie/FoxBot/blob/main/config.yaml) file which will be generated on first run. It is well documented using comments.
+
 ## How Can I Support This?
 
 We welcome fixes, features and donations.
 
-## Running It
-
-You can run this wherever you like.
-
 ## Premium Features
 
-Premium features:
+If you need custom features, integrations or support we can help. Just email us at foxbot@antfie.com. We currently have the following premium feature availables:
 
 - Monitoring share prices with buy/sell notifications
-
-Need custom features or integrations? email foxbot@antfie.com. 
-
-# Contributing
-
-We welcome contributions to the project.
 
 # Backlog
 
