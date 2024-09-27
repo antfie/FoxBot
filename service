@@ -1,0 +1,14 @@
+[Unit]
+Description=FoxBot
+After=network.target
+
+[Service]
+ExecStart=/opt/FoxBot/FoxBot
+WorkingDirectory=/opt/FoxBot
+StandardOutput=inherit
+StandardError=inherit
+Restart=always
+User=bot
+
+[Install]
+WantedBy=multi-user.target

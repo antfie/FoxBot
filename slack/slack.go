@@ -43,7 +43,7 @@ func (s *Slack) processor() {
 		select {
 		case <-ticker.C:
 			if s.duration != nil && !utils.IsWithinDuration(time.Now(), *s.duration) {
-				return
+				continue
 			}
 
 			messages := s.db.ConsumeSlackNotificationQueue()
