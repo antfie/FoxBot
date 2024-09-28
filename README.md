@@ -17,9 +17,19 @@ If a fox was a robot it would be fantastic. This is your very own personal robot
 
 You can run this wherever you like. Just download the appropriate binary from [here](https://github.com/antfie/FoxBot/releases/latest).
 
+## What Does It Look Like?
+
+In the console you would see something like this:
+
+![console.png](docs/images/console.png)
+
+However FoxBot really shines when you use it as a Slack bot:
+
+![slack.png](docs/images/slack.png)
+
 ## How Do I Configure It?
 
-There is a [config.yaml](https://github.com/antfie/FoxBot/blob/main/config.yaml) file which will be generated on first run. It is well documented using comments.
+There is a [config.yaml](https://github.com/antfie/FoxBot/blob/main/config.yaml) file which will be generated on first run.
 
 ## How Can I Support This?
 
@@ -36,7 +46,6 @@ If you need custom features, integrations or support we can help. Just email us 
 The following is a non-commital list of items we want to work through:
 
 - Document how to deploy to Raspberry Pi
-- Screenshots
 - Document the configuration file
 - Speed test functionality, ping, ICMP
 - Reduce noises and notifications at night when sleeping

@@ -18,9 +18,9 @@ fi
 FLAGS="-X main.AppVersion=$VERSION -s -w"
 
 echo -e "\n${CYAN}Building v${VERSION}...${NC}"
-GOOS=darwin GOARCH=arm64 go build -ldflags="$FLAGS" -buildvcs=false -trimpath -o "dist/foxbot-mac-arm64" .
-GOOS=darwin GOARCH=amd64 go build -ldflags="$FLAGS" -buildvcs=false -trimpath -o "dist/foxbot-mac-amd64" .
-GOOS=linux GOARCH=amd64 go build -ldflags="$FLAGS" -buildvcs=false -trimpath -o "dist/foxbot-linux-amd64" .
-GOOS=windows GOARCH=amd64 go build -ldflags="$FLAGS" -buildvcs=false -trimpath -o "dist/foxbot.exe" .
+CGO_ENABLED=1 GOOS=darwin GOARCH=arm64 go build -ldflags="$FLAGS" -buildvcs=false -trimpath -o "dist/foxbot-mac-arm64" .
+CGO_ENABLED=1 GOOS=darwin GOARCH=amd64 go build -ldflags="$FLAGS" -buildvcs=false -trimpath -o "dist/foxbot-mac-amd64" .
+CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -ldflags="$FLAGS" -buildvcs=false -trimpath -o "dist/foxbot-linux-amd64" .
+CGO_ENABLED=1 GOOS=windows GOARCH=amd64 go build -ldflags="$FLAGS" -buildvcs=false -trimpath -o "dist/foxbot.exe" .
 
 echo -e "\n${CYAN}Build Success${NC}"
