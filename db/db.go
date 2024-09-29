@@ -99,7 +99,7 @@ func (db *DB) ConsumeSlackNotificationQueue() []string {
 
 	var results []string
 
-	rows, err := db.db.Query("SELECT message FROM slack_notification")
+	rows, err := db.db.Query("SELECT message FROM slack_notification ORDER BY created")
 
 	if err != nil {
 		log.Panic(err)
