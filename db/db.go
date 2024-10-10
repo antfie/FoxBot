@@ -6,7 +6,7 @@ import (
 	"log"
 	"sync"
 
-	_ "github.com/mattn/go-sqlite3"
+	_ "modernc.org/sqlite"
 )
 
 type DB struct {
@@ -15,7 +15,7 @@ type DB struct {
 }
 
 func NewDB(dbPath string) *DB {
-	db, err := sql.Open("sqlite3", dbPath)
+	db, err := sql.Open("sqlite", dbPath)
 
 	if err != nil {
 		log.Panic(err)
