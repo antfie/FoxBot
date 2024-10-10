@@ -34,6 +34,11 @@ func main() {
 	print(fmt.Sprintf("FoxBot version %s\n", AppVersion))
 
 	c := config.Load(defaultConfigData)
+
+	if c.CheckForNewVersions {
+		checkForUpdates()
+	}
+
 	task := &tasks.Context{
 		Config: c,
 		DB:     db.NewDB(c.DBPath),

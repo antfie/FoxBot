@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"regexp"
+	"strconv"
 	"strings"
 )
 
@@ -52,4 +53,8 @@ func Pluralize(s string, count int) string {
 	}
 
 	return fmt.Sprintf("%d %ss", count, s)
+}
+
+func StringToFloat(input string) (float64, error) {
+	return strconv.ParseFloat(input, 64)
 }

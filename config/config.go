@@ -16,8 +16,9 @@ type yamlTimeCheck struct {
 }
 
 type yamlConfig struct {
-	DBPath string `yaml:"db_path"`
-	Output struct {
+	CheckForNewVersions bool   `yaml:"check_for_new_versions"`
+	DBPath              string `yaml:"db_path"`
+	Output              struct {
 		Console bool `yaml:"console"`
 		Slack   *struct {
 			Token     string `yaml:"token"`
@@ -110,7 +111,8 @@ func parseConfigFile(configFilePath string) *types.Config {
 	}
 
 	return &types.Config{
-		DBPath: config.DBPath,
+		CheckForNewVersions: config.CheckForNewVersions,
+		DBPath:              config.DBPath,
 		Output: types.Output{
 			Console: config.Output.Console,
 			Slack:   parseSlack(config),

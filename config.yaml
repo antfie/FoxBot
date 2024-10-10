@@ -1,3 +1,5 @@
+check_for_new_versions: true
+
 # This is the path to the sqlite3 database this app will use to store some data.
 # The DB  will be created if it doesn't exist i.e. on first-run.
 db_path: data.db
