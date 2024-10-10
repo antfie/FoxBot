@@ -1,5 +1,6 @@
-![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/antfie/FoxBot)
 ![GitHub License](https://img.shields.io/github/license/antfie/FoxBot)
+![GitHub Release](https://img.shields.io/github/v/release/antfie/FoxBot)
+![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/antfie/FoxBot)
 [![Go Report Card](https://goreportcard.com/badge/github.com/antfie/FoxBot)](https://goreportcard.com/report/github.com/antfie/FoxBot)
 
 # Introducing FoxBot
