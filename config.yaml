@@ -1,3 +1,4 @@
+# Set this to false if you don't want the robot to check for new versions released on GitHub
 check_for_new_versions: true
 
 # This is the path to the sqlite3 database this app will use to store some data.
