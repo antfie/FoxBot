@@ -27,6 +27,9 @@ func NewDB(dbPath string) *DB {
 }
 
 func (db *DB) Query(query string, args ...any) *sql.Rows {
+	db.mu.Lock()
+	defer db.mu.Unlock()
+
 	rows, err := db.db.Query(query, args...)
 
 	if err != nil {
