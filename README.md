@@ -58,4 +58,4 @@ The following is a non-commital list of items we want to work through:
 
 # Credits
 
-FotBot was created by Anrthony Fielding. Alert sounds by [Material Design](https://m2.material.io/design/sound/sound-resources.html) (Google), which are licenced under [CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/legalcode).
+FotBot was created by Anthony Fielding. Alert sounds by [Material Design](https://m2.material.io/design/sound/sound-resources.html) (Google), which are licenced under [CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/legalcode).
