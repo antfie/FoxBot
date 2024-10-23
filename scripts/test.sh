@@ -20,6 +20,7 @@ go vet ./...
 echo -e "\n${CYAN}Running gosec...${NC}"
 gosec ./...
 
+
 echo -e "${CYAN}Running osv-scanner...${NC}"
 osv-scanner scan .
 
