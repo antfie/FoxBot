@@ -26,8 +26,9 @@ osv-scanner scan .
 
 
 echo -e "\n${CYAN}Testing...${NC}"
-go test -v -coverprofile coverage.out -failfast -shuffle on -parallel 4 ./...
-go tool cover -html=coverage.out -o coverage.html
+mkdir -p test
+go test -v -coverprofile test/coverage.out -failfast -shuffle on -parallel 4 ./...
+go tool cover -html=test/coverage.out -o test/coverage.html
 
 # Consider using gcov2lcov tool / perhaps instead of go tool cover?
 #gocov convert coverage.out > coverage.lcov
