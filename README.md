@@ -37,7 +37,9 @@ There is a [config.yaml](https://github.com/antfie/FoxBot/blob/main/config.yaml)
 
 We welcome fixes, features and donations.
 
-[![Go Report Card](https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png)](https://buymeacoffee.com/antfie)
+<p>
+    <a href="https://www.buymeacoffee.com/antfie" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" "height="60" width="217"></a>
+</p>
 
 ## Premium Features
 
