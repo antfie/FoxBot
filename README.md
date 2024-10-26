@@ -37,6 +37,8 @@ There is a [config.yaml](https://github.com/antfie/FoxBot/blob/main/config.yaml)
 
 We welcome fixes, features and donations.
 
+[![Go Report Card](https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png)](https://buymeacoffee.com/antfie)
+
 ## Premium Features
 
 If you need custom features, integrations or support we can help. Just email us at foxbot@antfie.com. We currently have the following premium feature availables:
