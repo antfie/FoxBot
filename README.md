@@ -35,7 +35,7 @@ There is a [config.yaml](https://github.com/antfie/FoxBot/blob/main/config.yaml)
 
 ## How Can I Support This?
 
-We welcome fixes, features and donations.
+I welcome bug reports, fixes, features and donations to keep this going.
 
 <p>
     <a href="https://www.buymeacoffee.com/antfie" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" "height="60" width="217"></a>
