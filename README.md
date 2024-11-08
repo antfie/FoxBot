@@ -3,6 +3,7 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/antfie/FoxBot)](https://goreportcard.com/report/github.com/antfie/FoxBot)
 ![GitHub Release](https://img.shields.io/github/v/release/antfie/FoxBot)
 ![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/antfie/foxbot/total)
+![Docker Image Size](https://img.shields.io/docker/image-size/antfie/foxbot/latest)
 ![Docker Pulls](https://img.shields.io/docker/pulls/antfie/foxbot)
 
 # Introducing FoxBot
