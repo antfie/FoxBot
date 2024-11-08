@@ -19,6 +19,13 @@ If a fox was a robot it would be fantastic. This is your very own personal robot
 
 You can run this wherever you like. Just download the appropriate binary from [here](https://github.com/antfie/FoxBot/releases/latest).
 
+### Using Docker
+
+```bash
+docker pull antfie/foxbot
+docker run --rm -it -v "$(pwd):/app" antfie/foxbot
+```
+
 ## What Does It Look Like?
 
 In the console you would see something like this:
