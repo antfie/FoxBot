@@ -2,6 +2,7 @@ package tasks
 
 import (
 	"fmt"
+	"github.com/antfie/FoxBot/crypto"
 	"github.com/antfie/FoxBot/types"
 	"github.com/antfie/FoxBot/utils"
 	"io"
@@ -83,7 +84,11 @@ func detectHashChanges(site types.SiteChangeSite, body []byte) {
 		return
 	}
 
-	hash := utils.Sha256String(body)
+	hash, err := crypto.HashDataToString(body)
+
+	if err != nil {
+		log.Panic(err)
+	}
 
 	if hash == site.Hash {
 		return
@@ -97,7 +102,7 @@ func detectHashChanges(site types.SiteChangeSite, body []byte) {
 
 	utils.NotifyGood(fmt.Sprintf("Body is different for URL: %s: %s", site.URL, hash))
 
-	err := os.WriteFile(path.Clean(path.Join("data", hash)), body, 0600)
+	err = os.WriteFile(path.Clean(path.Join("data", hash)), body, 0600)
 
 	if err != nil {
 		log.Print(err)
