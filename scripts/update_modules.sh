@@ -14,7 +14,6 @@ echo -e "${CYAN}Updating dependencies...${NC}"
 go get -u ./...
 go mod download
 go mod tidy
-go mod vendor
 
 
 echo -e "\n${GREEN}Update successful${NC}"
