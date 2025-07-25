@@ -11,3 +11,23 @@ func (c *Context) Notify(message string) {
 		c.DB.QueueSlackNotification(message)
 	}
 }
+
+func (c *Context) NotifyGood(message string) {
+	if c.Config.Output.Console {
+		utils.NotifyConsoleGood(message)
+	}
+
+	if c.Config.Output.Slack != nil {
+		c.DB.QueueSlackNotification(message)
+	}
+}
+
+func (c *Context) NotifyBad(message string) {
+	if c.Config.Output.Console {
+		utils.NotifyConsoleBad(message)
+	}
+
+	if c.Config.Output.Slack != nil {
+		c.DB.QueueSlackNotification(message)
+	}
+}

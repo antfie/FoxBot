@@ -50,6 +50,13 @@ I welcome bug reports, fixes, features and donations to keep this going.
     <a href="https://www.buymeacoffee.com/antfie" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" "height="60" width="217"></a>
 </p>
 
+## Running locally
+
+```bash
+git clone https://github.com/antfie/FoxBot.git
+go run github.com/antfie/FoxBot
+```
+
 ## Premium Features
 
 If you need custom features, integrations or support we can help. Just email us at foxbot@antfie.com. We currently have the following premium feature availables:

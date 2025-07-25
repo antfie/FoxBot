@@ -1,31 +1,17 @@
 package tasks
 
 import (
-	"encoding/xml"
 	"fmt"
 	"github.com/PuerkitoBio/goquery"
 	"github.com/antfie/FoxBot/types"
 	"github.com/antfie/FoxBot/utils"
-	"io"
+	"github.com/mmcdole/gofeed"
 	"log"
 	"net/http"
 	"strings"
 	"sync"
 	"time"
 )
-
-type rssItem struct {
-	Title         string `xml:"title"`
-	Link          string `xml:"link"`
-	PublishedDate string `xml:"pubDate"`
-}
-
-type rssStructure struct {
-	RSS struct {
-		Title string    `xml:"title"`
-		Item  []rssItem `xml:"item"`
-	} `xml:"channel"`
-}
 
 const daysNewsConsideredOld = 30
 
@@ -49,38 +35,14 @@ func (c *Context) RSS() {
 }
 
 func (c *Context) processRSSFeed(feed types.RSSFeed) {
-	response := utils.HttpRequest("GET", feed.URL, nil, nil)
-
-	if response == nil {
-		utils.NotifyBad(fmt.Sprintf("RSS: Could not query API  %s", feed.URL))
-		return
-	}
-
-	if response.StatusCode != http.StatusOK {
-		utils.NotifyBad(fmt.Sprintf("RSS: API returned status of %s for %s", response.Status, feed.URL))
-		return
-	}
-
-	body, err := io.ReadAll(response.Body)
+	fp := gofeed.NewParser()
+	parsedFeed, err := fp.ParseURL(feed.URL)
 
 	if err != nil {
 		log.Panic(err)
 	}
 
-	err = response.Body.Close()
-
-	if err != nil {
-		log.Panic(err)
-	}
-
-	data := &rssStructure{}
-	err = xml.Unmarshal(body, data)
-
-	if err != nil {
-		log.Panic(err)
-	}
-
-	for _, item := range data.RSS.Item {
+	for _, item := range parsedFeed.Items {
 		if isIgnored(feed, item, c) {
 			continue
 		}
@@ -97,18 +59,24 @@ func (c *Context) processRSSFeed(feed types.RSSFeed) {
 			formattedTitle = strings.ReplaceAll(item.Title, foundKeyword, fmt.Sprintf("*%s*", foundKeyword))
 		}
 
-		message := fmt.Sprintf("[%s]: %s - <%s>", formattedName, formattedTitle, item.Link)
+		formattedLink := item.Link
+
+		if strings.Contains(item.Link, "?") {
+			formattedLink = strings.SplitN(formattedLink, "?", 2)[0]
+		}
+
+		message := fmt.Sprintf("[%s]: %s - <%s>", formattedName, formattedTitle, formattedLink)
 
 		if len(foundKeyword) == 0 {
-			foundKeyword = processContents(feed, item.Link)
+			foundKeyword = processContents(feed, formattedLink)
 
 			if len(foundKeyword) > 0 {
-				message = fmt.Sprintf("[%s]: %s *%s* - <%s>", formattedName, item.Title, foundKeyword, item.Link)
+				message = fmt.Sprintf("[%s]: %s *%s* - <%s>", formattedName, item.Title, foundKeyword, formattedLink)
 			}
 		}
 
 		if len(foundKeyword) > 0 {
-			c.Notify(fmt.Sprintf("📰 🚨 %s", message))
+			c.NotifyGood(fmt.Sprintf("📰 🚨 %s", message))
 		} else {
 			c.Notify(fmt.Sprintf("📰 %s", message))
 		}
@@ -161,10 +129,8 @@ func processContents(feed types.RSSFeed, url string) string {
 	return utils.StringContainsWordIgnoreCase(contents, feed.HTMLImportantKeywords)
 }
 
-func isIgnored(feed types.RSSFeed, item rssItem, c *Context) bool {
-	timestamp := utils.ParseRSSTimestampFromString(item.PublishedDate)
-
-	if timestamp.Add(time.Hour * 24 * daysNewsConsideredOld).Before(time.Now()) {
+func isIgnored(feed types.RSSFeed, item *gofeed.Item, c *Context) bool {
+	if item.PublishedParsed.Add(time.Hour * 24 * daysNewsConsideredOld).Before(time.Now()) {
 		return true
 	}
 

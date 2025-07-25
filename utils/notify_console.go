@@ -9,10 +9,12 @@ func NotifyConsole(message string) {
 	log.Print(color.CyanString(message))
 }
 
-func NotifyGoodConsole(message string) {
+func NotifyConsoleGood(message string) {
 	log.Print(color.GreenString(message))
+	play("notification_decorative-01")
 }
 
-func NotifyBadConsole(message string) {
+func NotifyConsoleBad(message string) {
 	log.Print(color.HiRedString(message))
+	play("alert_error-01")
 }
