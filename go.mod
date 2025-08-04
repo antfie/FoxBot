@@ -10,7 +10,7 @@ require (
 	github.com/stretchr/testify v1.9.0
 	golang.org/x/crypto v0.40.0
 	gopkg.in/yaml.v3 v3.0.1
-	modernc.org/sqlite v1.38.1
+	modernc.org/sqlite v1.38.2
 )
 
 require (
@@ -31,7 +31,7 @@ require (
 	golang.org/x/net v0.42.0 // indirect
 	golang.org/x/sys v0.34.0 // indirect
 	golang.org/x/text v0.27.0 // indirect
-	modernc.org/libc v1.66.4 // indirect
+	modernc.org/libc v1.66.6 // indirect
 	modernc.org/mathutil v1.7.1 // indirect
 	modernc.org/memory v1.11.0 // indirect
 )
