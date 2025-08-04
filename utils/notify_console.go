@@ -11,10 +11,10 @@ func NotifyConsole(message string) {
 
 func NotifyConsoleGood(message string) {
 	log.Print(color.GreenString(message))
-	play("notification_decorative-01")
+	go play("notification_decorative-01")
 }
 
 func NotifyConsoleBad(message string) {
 	log.Print(color.HiRedString(message))
-	play("alert_error-01")
+	go play("alert_error-01")
 }
