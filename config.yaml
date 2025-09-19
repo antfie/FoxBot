@@ -10,6 +10,45 @@ output:
   # Do you want to see notifications in the console?
   console: true
 
+  # Do you want notifications via Slack?
+  # You can create your own Slack app (https://api.slack.com/docs/apps) to do this.
+  slack:
+    # Set your Slack token here
+    token: xoxb-not-a-real-token-this-will-not-work
+
+    # The channel ID to send notifications to
+    channel_id: 000
+
+    # Only send notifications between these times.
+    # If you remove these settings notifications will not be queued up.
+    from: 08:00
+    to: 18:00
+
+# Enable this for inspiration to help you keep your goals on track
+reminders:
+  # How often to be reminded?
+  check:
+    frequency: hourly
+    from: 08:00
+    to: 17:00
+  reminders:
+    - What are you grateful for? 🧘
+    - Are you living and having fun? 🤩
+    - Be content with what you have today 😆
+    - You are 100% where you want to be right now 🎯
+    - Take time away from the keyboard ⛰️
+
+# Do you want to time some things?
+countdown:
+  # How often to be notified of timer changes?
+  check:
+    frequency: hourly
+    from: 08:00
+    to: 17:00
+  timers:
+  - name: New Year
+    date: 01/01/2025
+
 # Check your RSS feeds
 rss:
   # How often to check the feeds?
@@ -17,37 +56,23 @@ rss:
     frequency: half_hourly
   # A list of important keywords to look for. These will be highlighted in the notifications
   important_keywords:
-    - npm
-    - npmjs
-    - package
-    - malware
-    - pypi
+    - FoxBot
   feeds:
-    - group:
-      html:
-        tag: body
+  - group: BBC
+    html:
+        tag: main
         important_keywords:
-          - npm
-          - npmjs
-          - package
-          - malware
-          - pypi
-      feeds:
-      - name: Socket
-        url: https://socket.dev/api/blog/feed.atom
-      - name: TheHackersNews
-        url: https://feeds.feedburner.com/TheHackersNews
-      - name: Ars Technica
-        url: https://feeds.arstechnica.com/arstechnica/index
-    - group:
-      html:
-        tag: article
-        important_keywords:
-          - npm
-          - npmjs
-          - package
-          - malware
-          - pypi
-      feeds:
-        - name: BleepingComputer
-          url: https://www.bleepingcomputer.com/feed/
+          - breaking news story
+        ignore_url_signatures:
+          - /play/
+          - /iplayer/
+    important_keywords:
+      - BREAKING
+    ignore_url_signatures:
+      - /sport/
+    feeds:
+    - name: Main
+      url: https://feeds.bbci.co.uk/news/rss.xml
+  - feeds:
+      - name: xkcd
+        url: https://xkcd.com/rss.xml
