@@ -2,15 +2,16 @@ package tasks
 
 import (
 	"fmt"
-	"github.com/PuerkitoBio/goquery"
-	"github.com/antfie/FoxBot/types"
-	"github.com/antfie/FoxBot/utils"
-	"github.com/mmcdole/gofeed"
 	"log"
 	"net/http"
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/PuerkitoBio/goquery"
+	"github.com/antfie/FoxBot/types"
+	"github.com/antfie/FoxBot/utils"
+	"github.com/mmcdole/gofeed"
 )
 
 const daysNewsConsideredOld = 30
@@ -39,7 +40,8 @@ func (c *Context) processRSSFeed(feed types.RSSFeed) {
 	parsedFeed, err := fp.ParseURL(feed.URL)
 
 	if err != nil {
-		log.Panic(err)
+		utils.NotifyBad(fmt.Sprintf("Could not process feed: %s", feed.URL))
+		return
 	}
 
 	for _, item := range parsedFeed.Items {
