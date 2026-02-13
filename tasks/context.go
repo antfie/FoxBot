@@ -2,8 +2,8 @@ package tasks
 
 import (
 	"github.com/antfie/FoxBot/db"
-	"github.com/antfie/FoxBot/slack"
-	"github.com/antfie/FoxBot/telegram"
+	"github.com/antfie/FoxBot/integrations/slack"
+	"github.com/antfie/FoxBot/integrations/telegram"
 	"github.com/antfie/FoxBot/types"
 )
 
