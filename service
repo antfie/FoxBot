@@ -1,14 +1,40 @@
 [Unit]
 Description=FoxBot
+Documentation=https://github.com/antfie/foxbot
 After=network.target
+StartLimitIntervalSec=60
 
 [Service]
-ExecStart=/opt/FoxBot/FoxBot
+Type=simple
+User=FoxBot
+Group=FoxBot
 WorkingDirectory=/opt/FoxBot
-StandardOutput=inherit
-StandardError=inherit
-Restart=always
-User=bot
+ExecStart=/opt/FoxBot/FoxBot
+
+# Restart policy
+Restart=on-failure
+RestartSec=10
+StartLimitBurst=5
+
+# Security hardening
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/FoxBot
+
+# Limit capabilities
+CapabilityBoundingSet=
+AmbientCapabilities=
+
+# Resource limits
+LimitNOFILE=65535
+LimitNPROC=4096
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=FoxBot
 
 [Install]
 WantedBy=multi-user.target

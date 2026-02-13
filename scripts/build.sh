@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Exit if any command fails
-set -e
+set -euo pipefail
 
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -11,9 +11,7 @@ NC='\033[0m' # No Color
 rm -rf ./dist
 ./scripts/test.sh
 
-if [[ -z "${VERSION}" ]]; then
-    VERSION="0.0"
-fi
+VERSION="${VERSION:-0.0}"
 
 FLAGS="-X main.AppVersion=$VERSION -s -w"
 
