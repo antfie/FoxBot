@@ -62,12 +62,9 @@ func (c *Context) processRSSFeed(feed types.RSSFeed) {
 
 		formattedLink := item.Link
 
-		if strings.Contains(item.Link, "?") {
-			formattedLink = strings.SplitN(formattedLink, "?", 2)[0]
-		}
-
 		message := fmt.Sprintf("[%s]: %s - <%s>", formattedName, formattedTitle, formattedLink)
 
+		// No title keyword found so look at the contents of the link
 		if len(foundKeyword) == 0 {
 			foundKeyword = processContents(feed, formattedLink)
 
@@ -85,7 +82,7 @@ func (c *Context) processRSSFeed(feed types.RSSFeed) {
 }
 
 func processContents(feed types.RSSFeed, url string) string {
-	if len(feed.HTMLTag) < 1 {
+	if len(feed.HTMLContentTag) < 1 {
 		return ""
 	}
 
@@ -116,7 +113,7 @@ func processContents(feed types.RSSFeed, url string) string {
 		return ""
 	}
 
-	contents := doc.Find(feed.HTMLTag).Text()
+	contents := doc.Find(feed.HTMLContentTag).Text()
 
 	if len(contents) < 1 {
 		log.Printf("RSS: Could not find HTML contents %s", url)

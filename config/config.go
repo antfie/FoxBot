@@ -1,12 +1,13 @@
 package config
 
 import (
-	"github.com/antfie/FoxBot/types"
-	"github.com/antfie/FoxBot/utils"
-	"gopkg.in/yaml.v3"
 	"log"
 	"os"
 	"path"
+
+	"github.com/antfie/FoxBot/types"
+	"github.com/antfie/FoxBot/utils"
+	"gopkg.in/yaml.v3"
 )
 
 type yamlTimeCheck struct {
@@ -52,7 +53,7 @@ type yamlConfig struct {
 			ImportantKeywords   []string `yaml:"important_keywords"`
 			IgnoreURLSignatures []string `yaml:"ignore_url_signatures"`
 			HTML                struct {
-				Tag                 string   `yaml:"tag"`
+				ContentTag          string   `yaml:"tag"`
 				ImportantKeywords   []string `yaml:"important_keywords"`
 				IgnoreURLSignatures []string `yaml:"ignore_url_signatures"`
 			} `yaml:"html"`
@@ -201,7 +202,7 @@ func parseRSS(config *yamlConfig) *types.RSS {
 				IgnoreURLSignatures:     rssGroup.IgnoreURLSignatures,
 				Name:                    rssFeed.Name,
 				URL:                     rssFeed.URL,
-				HTMLTag:                 rssGroup.HTML.Tag,
+				HTMLContentTag:          rssGroup.HTML.ContentTag,
 				HTMLImportantKeywords:   rssGroup.HTML.ImportantKeywords,
 				HTMLIgnoreURLSignatures: rssGroup.HTML.IgnoreURLSignatures,
 			})
