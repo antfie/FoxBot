@@ -3,7 +3,7 @@ package config
 import (
 	"log"
 	"os"
-	"path"
+	"path/filepath"
 
 	"github.com/antfie/FoxBot/types"
 	"github.com/antfie/FoxBot/utils"
@@ -76,23 +76,23 @@ type yamlConfig struct {
 }
 
 func Load(defaultConfigData []byte) *types.Config {
-	configFile := "config.yaml"
+	configFile := filepath.Clean("config.yaml")
 
 	if len(os.Args) == 2 {
-		configFile = os.Args[1]
+		configFile = filepath.Clean(os.Args[1])
 
-		_, err := os.Stat(configFile)
+		_, err := os.Stat(configFile) //#nosec G703 -- config path is from CLI arg
 
 		if err != nil {
-			log.Fatalf("Could not open config file \"%s\".", configFile)
+			log.Fatalf("Could not open config file %q.", configFile) //#nosec G706 -- path is cleaned
 		}
 	}
 
-	_, err := os.Stat(configFile)
+	_, err := os.Stat(configFile) //#nosec G703 -- config path is from CLI arg
 
 	if err != nil {
 		log.Print("No config file found. Creating a new config file...")
-		err := os.WriteFile(configFile, defaultConfigData, 0600)
+		err := os.WriteFile(configFile, defaultConfigData, 0600) //#nosec G703 -- config path is from CLI arg
 
 		if err != nil {
 			log.Fatal(err)
@@ -103,7 +103,7 @@ func Load(defaultConfigData []byte) *types.Config {
 }
 
 func parseConfigFile(configFilePath string) *types.Config {
-	yamlFile, err := os.ReadFile(path.Clean(configFilePath))
+	yamlFile, err := os.ReadFile(filepath.Clean(configFilePath)) //#nosec G703 -- config path is from CLI arg
 
 	if err != nil {
 		log.Panic(err)

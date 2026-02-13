@@ -69,5 +69,7 @@ func (s *Slack) notify(message string) {
 		return
 	}
 
-	response.Body.Close()
+	if err := response.Body.Close(); err != nil {
+		log.Print(err)
+	}
 }

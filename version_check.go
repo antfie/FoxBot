@@ -21,7 +21,7 @@ func checkForUpdates() {
 
 	req.Header.Add("Accept", "application/json")
 
-	resp, err := client.Do(req)
+	resp, err := client.Do(req) //#nosec G704 -- URL is hardcoded
 
 	if err != nil {
 		return

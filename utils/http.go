@@ -42,7 +42,7 @@ func HttpRequest(method, url string, headers map[string]string, body io.Reader) 
 }
 
 func makeRequest(client *http.Client, req *http.Request) *http.Response {
-	response, err := client.Do(req)
+	response, err := client.Do(req) //#nosec G704 -- URLs are from user config
 
 	if err != nil {
 		return nil
