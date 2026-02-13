@@ -3,17 +3,20 @@ package main
 import (
 	_ "embed"
 	"fmt"
+	"io"
+	"log"
+	"os"
+	"os/signal"
+	"path/filepath"
+	"runtime"
+	"syscall"
+
 	"github.com/antfie/FoxBot/bayes"
 	"github.com/antfie/FoxBot/config"
 	"github.com/antfie/FoxBot/db"
 	"github.com/antfie/FoxBot/integrations"
 	"github.com/antfie/FoxBot/tasks"
 	"github.com/antfie/FoxBot/utils"
-	"log"
-	"os"
-	"os/signal"
-	"runtime"
-	"syscall"
 )
 
 //go:embed config.yaml
@@ -35,6 +38,17 @@ func main() {
 	print(fmt.Sprintf("FoxBot version %s\n", AppVersion))
 
 	c := config.Load(defaultConfigData)
+
+	if len(c.LogPath) > 0 {
+		logFile, err := os.OpenFile(filepath.Clean(c.LogPath), os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0600) //#nosec G304 -- log path is from config
+
+		if err != nil {
+			log.Fatalf("Could not open log file %q: %v", c.LogPath, err)
+		}
+
+		defer logFile.Close()
+		log.SetOutput(io.MultiWriter(os.Stderr, logFile))
+	}
 
 	if c.CheckForNewVersions && AppVersion != "0.0" {
 		checkForUpdates()

@@ -16,6 +16,9 @@ check_for_new_versions: true
 
 # Path to the SQLite database (created automatically)
 db_path: data.db
+
+# Write logs to a file in addition to stderr (optional)
+# log_path: foxbot.log
 ```
 
 ### Output

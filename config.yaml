@@ -5,6 +5,10 @@ check_for_new_versions: true
 # The DB  will be created if it doesn't exist i.e. on first-run.
 db_path: data.db
 
+# Set this to write logs to a file in addition to the console.
+# Useful when running as a service where you can't see stderr.
+# log_path: foxbot.log
+
 # This section is all about where the notifications end up
 output:
   # Do you want to see notifications in the console?

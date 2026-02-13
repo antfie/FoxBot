@@ -3,6 +3,7 @@ package types
 type Config struct {
 	CheckForNewVersions bool
 	DBPath              string
+	LogPath             string
 	Output              Output
 	Reminders           *Reminders
 	Countdown           *Countdown
