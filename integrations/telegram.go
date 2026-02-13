@@ -101,7 +101,7 @@ func (t *Telegram) SendWithFeedback(message, articleHash string) {
 		return
 	}
 
-	replyMarkup := fmt.Sprintf(`{"inline_keyboard":[[{"text":"\U0001f44d","callback_data":"r:%s"},{"text":"\U0001f44e","callback_data":"i:%s"}]]}`, articleHash, articleHash)
+	replyMarkup := fmt.Sprintf(`{"inline_keyboard":[[{"text":"👍","callback_data":"r:%s"},{"text":"👎","callback_data":"i:%s"}]]}`, articleHash, articleHash)
 
 	form := url.Values{}
 	form.Add("chat_id", t.chatID)
