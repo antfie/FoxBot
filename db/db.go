@@ -21,6 +21,22 @@ func NewDB(dbPath string) *DB {
 		log.Panic(err)
 	}
 
+	db.SetMaxOpenConns(1)
+
+	pragmas := []string{
+		"PRAGMA journal_mode = WAL",
+		"PRAGMA synchronous = NORMAL",
+		"PRAGMA busy_timeout = 5000",
+		"PRAGMA foreign_keys = ON",
+		"PRAGMA cache_size = -2000",
+	}
+
+	for _, p := range pragmas {
+		if _, err := db.Exec(p); err != nil {
+			log.Panicf("failed to execute %s: %v", p, err)
+		}
+	}
+
 	runMigrations(db)
 
 	return &DB{db: db}
