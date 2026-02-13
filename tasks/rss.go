@@ -75,6 +75,8 @@ func (c *Context) processRSSFeed(feed types.RSSFeed) {
 
 		if len(foundKeyword) > 0 {
 			c.NotifyGood(fmt.Sprintf("📰 🚨 %s", message))
+		} else if feed.KeywordOnly {
+			utils.NotifyConsole(fmt.Sprintf("📰 %s", message))
 		} else {
 			c.Notify(fmt.Sprintf("📰 %s", message))
 		}
