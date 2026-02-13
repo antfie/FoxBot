@@ -224,6 +224,7 @@ func (t *Telegram) processCallback(query *telegramCallbackQuery) {
 
 	// Same button pressed again — ignore duplicate
 	if currentLabel == newLabel {
+		log.Printf("Bayes [%s] duplicate %s ignored: %s", feedGroup, newLabel, title)
 		t.answerCallback(query.ID)
 		return
 	}
@@ -231,13 +232,14 @@ func (t *Telegram) processCallback(query *telegramCallbackQuery) {
 	// Changed mind — untrain old label first
 	if len(currentLabel) > 0 {
 		t.bayes.Untrain(feedGroup, title, currentLabel == "relevant")
+		log.Printf("Bayes [%s] changed %s -> %s: %s", feedGroup, currentLabel, newLabel, title)
+	} else {
+		log.Printf("Bayes [%s] trained as %s: %s", feedGroup, newLabel, title)
 	}
 
 	// Train with new label
 	t.bayes.Train(feedGroup, title, prefix == 'r')
 	t.db.BayesSetArticleLabel(hash, newLabel)
-
-	log.Printf("Bayes trained [%s] as %s: %s", feedGroup, newLabel, title)
 
 	t.answerCallback(query.ID)
 }
