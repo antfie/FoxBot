@@ -36,7 +36,7 @@ func main() {
 
 	c := config.Load(defaultConfigData)
 
-	if c.CheckForNewVersions {
+	if c.CheckForNewVersions && AppVersion != "0.0" {
 		checkForUpdates()
 	}
 
