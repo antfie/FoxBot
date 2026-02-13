@@ -3,10 +3,10 @@ package main
 import (
 	_ "embed"
 	"fmt"
+	"github.com/antfie/FoxBot/bayes"
 	"github.com/antfie/FoxBot/config"
 	"github.com/antfie/FoxBot/db"
-	"github.com/antfie/FoxBot/integrations/slack"
-	"github.com/antfie/FoxBot/integrations/telegram"
+	"github.com/antfie/FoxBot/integrations"
 	"github.com/antfie/FoxBot/tasks"
 	"github.com/antfie/FoxBot/utils"
 	"log"
@@ -45,12 +45,14 @@ func main() {
 		DB:     db.NewDB(c.DBPath),
 	}
 
+	task.Bayes = bayes.NewClassifier(task.DB)
+
 	if c.Output.Slack != nil {
-		task.Slack = slack.NewSlack(c.Output.Slack, task.DB)
+		task.Slack = integrations.NewSlack(c.Output.Slack, task.DB)
 	}
 
 	if c.Output.Telegram != nil {
-		task.Telegram = telegram.NewTelegram(c.Output.Telegram, task.DB)
+		task.Telegram = integrations.NewTelegram(c.Output.Telegram, task.DB, task.Bayes)
 	}
 
 	var tasksToRun []*tasks.Task

@@ -7,7 +7,6 @@ type RSS struct {
 
 type RSSFeed struct {
 	Group                   string
-	KeywordOnly             bool
 	ImportantKeywords       []string
 	IgnoreURLSignatures     []string
 	Name                    string

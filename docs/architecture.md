@@ -14,13 +14,17 @@ graph TD
     C --> G[Site Changes]
     D --> H[Notification Router]
     E --> H
-    F --> H
+    F -->|keywords + Bayes scoring| H
     G --> H
     H --> I[Console]
     H --> J[Slack Queue]
-    H --> K[Telegram Queue]
+    H --> K[Telegram]
     J -->|every 5s| L[Slack API]
-    K -->|every 5s| M[Telegram API]
+    K -->|batch queue every 5s| M[Telegram API]
+    K -->|RSS with feedback buttons| M
+    M -->|getUpdates every 30s| N[Feedback Processor]
+    N -->|train| O[Bayes Classifier]
+    O -->|score| F
 ```
 
 ## Startup Sequence
@@ -37,7 +41,9 @@ sequenceDiagram
     Config-->>Main: Parsed config
     Main->>DB: NewDB (run migrations)
     DB-->>Main: DB handle
+    Main->>Main: Create Bayes classifier
     Main->>Integrations: Start Slack/Telegram processors
+    Note over Integrations: Telegram starts feedback poller
     Integrations-->>Main: Background goroutines running
     Main->>Scheduler: Register enabled tasks
     Main->>Scheduler: Run (loop every 1s)
@@ -76,16 +82,18 @@ flowchart TD
     F -->|yes| D
     F -->|no| G[Check title for keywords]
     G --> H{Keyword found?}
-    H -->|yes| I["Notify: 📰 🚨 alert"]
+    H -->|yes| I["Notify: 📰 🚨 alert<br/>with feedback buttons"]
     H -->|no| J{HTML tags configured?}
-    J -->|no| K{keyword_only?}
+    J -->|no| K{Bayes ready?}
     J -->|yes| L[Fetch article HTML]
     L --> M[Extract content from tags]
     M --> N{Body keyword found?}
     N -->|yes| I
     N -->|no| K
-    K -->|yes| O[Console only]
-    K -->|no| P["Notify: 📰 all outputs"]
+    K -->|not ready| P["Notify: 📰 all outputs<br/>with feedback buttons"]
+    K -->|ready| Q{Bayes score > 0.5?}
+    Q -->|yes| P
+    Q -->|no| O[Console only]
 ```
 
 ### Keyword Matching
@@ -100,9 +108,9 @@ Three levels of keywords exist:
 | Group `important_keywords` | Merged with global | RSS item titles |
 | HTML `important_keywords` | Group only | Article body text |
 
-### keyword_only Mode
+### Bayes Intelligence
 
-When `keyword_only: true` is set on a feed group, items that don't match any keyword are logged to console only. Keyword matches still go to all configured outputs (Telegram, Slack, console). This dramatically reduces notification volume for high-traffic feed groups.
+When no keyword matches, the Naive Bayes classifier decides whether to notify or suppress. The classifier is trained per feed group via user feedback (👍/👎 inline buttons on Telegram notifications). Until 30 articles have been labelled for a feed group, all items are sent through for training. See [intelligence.md](intelligence.md) for full details.
 
 ## Site Change Detection
 
@@ -154,17 +162,21 @@ Messages are queued in SQLite and batched by the background processors. This mea
 graph TD
     main --> config
     main --> db
+    main --> bayes
     main --> tasks
     main --> integrations/slack
     main --> integrations/telegram
     tasks --> db
+    tasks --> bayes
     tasks --> types
     tasks --> utils
     tasks --> crypto
+    bayes --> db
     integrations/slack --> db
     integrations/slack --> types
     integrations/slack --> utils
     integrations/telegram --> db
+    integrations/telegram --> bayes
     integrations/telegram --> types
     integrations/telegram --> utils
     config --> types
@@ -186,3 +198,7 @@ SQLite with a single mutex serialising all access. Migrations are embedded in th
 - Slack notification queue
 - Telegram notification queue
 - Seen RSS links (for deduplication, cleaned up after 30 days)
+- Bayes model (word frequencies per feed group)
+- Bayes article references (for feedback lookup, cleaned up after 30 days)
+- Bayes stats (document counts per feed group)
+- Telegram polling state (last processed update ID)

@@ -74,8 +74,6 @@ rss:
     - FoxBot
   feeds:
   - group: BBC
-    # Only send notifications for keyword matches. Non-matching items go to console only.
-    # keyword_only: true
     html:
         tags:
           - main

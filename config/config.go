@@ -50,7 +50,6 @@ type yamlConfig struct {
 		ImportantKeywords []string      `yaml:"important_keywords"`
 		Feeds             []struct {
 			Group               string   `yaml:"group"`
-			KeywordOnly         bool     `yaml:"keyword_only"`
 			ImportantKeywords   []string `yaml:"important_keywords"`
 			IgnoreURLSignatures []string `yaml:"ignore_url_signatures"`
 			HTML                struct {
@@ -199,7 +198,6 @@ func parseRSS(config *yamlConfig) *types.RSS {
 		for _, rssFeed := range rssGroup.Feeds {
 			feeds = append(feeds, types.RSSFeed{
 				Group:                   rssGroup.Group,
-				KeywordOnly:             rssGroup.KeywordOnly,
 				ImportantKeywords:       utils.MergeStringArrays(rssGroup.ImportantKeywords, config.RSS.ImportantKeywords),
 				IgnoreURLSignatures:     rssGroup.IgnoreURLSignatures,
 				Name:                    rssFeed.Name,

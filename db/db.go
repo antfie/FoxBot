@@ -188,6 +188,140 @@ func (db *DB) QueueSlackNotification(message string) {
 	}
 }
 
+// Bayes methods
+
+func (db *DB) BayesUpsertWord(feedGroup, word string, relevant bool) {
+	db.mu.Lock()
+	defer db.mu.Unlock()
+
+	if relevant {
+		db.insert("INSERT INTO bayes_model (feed_group, word, relevant, irrelevant) VALUES (?, ?, 1, 0) ON CONFLICT(feed_group, word) DO UPDATE SET relevant = relevant + 1", feedGroup, word)
+	} else {
+		db.insert("INSERT INTO bayes_model (feed_group, word, relevant, irrelevant) VALUES (?, ?, 0, 1) ON CONFLICT(feed_group, word) DO UPDATE SET irrelevant = irrelevant + 1", feedGroup, word)
+	}
+}
+
+func (db *DB) BayesGetWordCounts(feedGroup string) map[string][2]int {
+	db.mu.Lock()
+	defer db.mu.Unlock()
+
+	result := make(map[string][2]int)
+
+	rows, err := db.db.Query("SELECT word, relevant, irrelevant FROM bayes_model WHERE feed_group = ?", feedGroup)
+
+	if err != nil {
+		log.Print(err)
+		return result
+	}
+
+	for rows.Next() {
+		var word string
+		var relevant, irrelevant int
+		err = rows.Scan(&word, &relevant, &irrelevant)
+
+		if err != nil {
+			log.Print(err)
+			continue
+		}
+
+		result[word] = [2]int{relevant, irrelevant}
+	}
+
+	if err = rows.Err(); err != nil {
+		log.Print(err)
+	}
+
+	if err = rows.Close(); err != nil {
+		log.Print(err)
+	}
+
+	return result
+}
+
+func (db *DB) BayesIncrementStats(feedGroup string, relevant bool) {
+	db.mu.Lock()
+	defer db.mu.Unlock()
+
+	if relevant {
+		db.insert("INSERT INTO bayes_stats (feed_group, relevant, irrelevant) VALUES (?, 1, 0) ON CONFLICT(feed_group) DO UPDATE SET relevant = relevant + 1", feedGroup)
+	} else {
+		db.insert("INSERT INTO bayes_stats (feed_group, relevant, irrelevant) VALUES (?, 0, 1) ON CONFLICT(feed_group) DO UPDATE SET irrelevant = irrelevant + 1", feedGroup)
+	}
+}
+
+func (db *DB) BayesGetStats(feedGroup string) (int, int) {
+	db.mu.Lock()
+	defer db.mu.Unlock()
+
+	row := db.db.QueryRow("SELECT relevant, irrelevant FROM bayes_stats WHERE feed_group = ?", feedGroup)
+
+	var relevant, irrelevant int
+	err := row.Scan(&relevant, &irrelevant)
+
+	if err != nil {
+		return 0, 0
+	}
+
+	return relevant, irrelevant
+}
+
+func (db *DB) BayesSaveArticle(hash, feedGroup, title string) {
+	db.mu.Lock()
+	defer db.mu.Unlock()
+
+	db.insert("INSERT OR IGNORE INTO bayes_article (hash, feed_group, title) VALUES (?, ?, ?)", hash, feedGroup, title)
+}
+
+func (db *DB) BayesGetArticle(hash string) (string, string, bool) {
+	db.mu.Lock()
+	defer db.mu.Unlock()
+
+	row := db.db.QueryRow("SELECT feed_group, title FROM bayes_article WHERE hash = ?", hash)
+
+	var feedGroup, title string
+	err := row.Scan(&feedGroup, &title)
+
+	if err != nil {
+		return "", "", false
+	}
+
+	return feedGroup, title, true
+}
+
+func (db *DB) BayesCleanupOldArticles() {
+	db.mu.Lock()
+	defer db.mu.Unlock()
+
+	_, err := db.db.Exec("DELETE FROM bayes_article WHERE created < date('now', '-30 day')")
+
+	if err != nil {
+		log.Print(err)
+	}
+}
+
+func (db *DB) GetTelegramState(key string) string {
+	db.mu.Lock()
+	defer db.mu.Unlock()
+
+	row := db.db.QueryRow("SELECT value FROM telegram_state WHERE key = ?", key)
+
+	var value string
+	err := row.Scan(&value)
+
+	if err != nil {
+		return ""
+	}
+
+	return value
+}
+
+func (db *DB) SetTelegramState(key, value string) {
+	db.mu.Lock()
+	defer db.mu.Unlock()
+
+	db.insert("INSERT INTO telegram_state (key, value) VALUES (?, ?) ON CONFLICT(key) DO UPDATE SET value = ?", key, value, value)
+}
+
 func (db *DB) ConsumeSlackNotificationQueue() []string {
 	db.mu.Lock()
 	defer db.mu.Unlock()

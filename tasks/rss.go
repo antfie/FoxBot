@@ -1,6 +1,8 @@
 package tasks
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
 	"fmt"
 	"log"
 	"net/http"
@@ -23,6 +25,7 @@ func (c *Context) RSS() {
 	rssOnce.Do(func() {
 		// Delete any old news
 		c.DB.Exec(fmt.Sprintf("DELETE FROM rss WHERE created < date('now', '-%d day')", daysNewsConsideredOld))
+		c.DB.BayesCleanupOldArticles()
 	})
 
 	if c.Config.RSS.Check.Duration != nil && !utils.IsWithinDuration(time.Now(), *c.Config.RSS.Check.Duration) {
@@ -74,11 +77,19 @@ func (c *Context) processRSSFeed(feed types.RSSFeed) {
 		}
 
 		if len(foundKeyword) > 0 {
-			c.NotifyGood(fmt.Sprintf("📰 🚨 %s", message))
-		} else if feed.KeywordOnly {
-			utils.NotifyConsole(fmt.Sprintf("📰 %s", message))
+			// Keyword match - always notify all channels
+			c.notifyRSS(fmt.Sprintf("📰 🚨 %s", message), feed.Group, item.Link, true)
+		} else if c.Bayes != nil && c.Bayes.IsReady(feed.Group) {
+			// Bayes has enough data - let it decide
+			score := c.Bayes.Score(feed.Group, item.Title)
+			if score > 0.5 {
+				c.notifyRSS(fmt.Sprintf("📰 %s", message), feed.Group, item.Link, false)
+			} else {
+				utils.NotifyConsole(fmt.Sprintf("📰 %s", message))
+			}
 		} else {
-			c.Notify(fmt.Sprintf("📰 %s", message))
+			// Bayes not ready - send everything for training
+			c.notifyRSS(fmt.Sprintf("📰 %s", message), feed.Group, item.Link, false)
 		}
 	}
 }
@@ -123,6 +134,31 @@ func processContents(feed types.RSSFeed, url string) string {
 	}
 
 	return utils.StringContainsWordIgnoreCase(contents, feed.HTMLImportantKeywords)
+}
+
+func articleHash(link string) string {
+	h := sha256.Sum256([]byte(link))
+	return hex.EncodeToString(h[:5]) // 10 hex chars
+}
+
+func (c *Context) notifyRSS(message, feedGroup, link string, isGood bool) {
+	if c.Config.Output.Console {
+		if isGood {
+			utils.NotifyConsoleGood(message)
+		} else {
+			utils.NotifyConsole(message)
+		}
+	}
+
+	if c.Slack != nil {
+		c.DB.QueueSlackNotification(message)
+	}
+
+	if c.Telegram != nil {
+		hash := articleHash(link)
+		c.DB.BayesSaveArticle(hash, feedGroup, message)
+		c.Telegram.SendWithFeedback(message, hash)
+	}
 }
 
 func isIgnored(feed types.RSSFeed, item *gofeed.Item, c *Context) bool {
