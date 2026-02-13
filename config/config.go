@@ -18,14 +18,20 @@ type yamlTimeCheck struct {
 type yamlConfig struct {
 	CheckForNewVersions bool   `yaml:"check_for_new_versions"`
 	DBPath              string `yaml:"db_path"`
-	Output              struct {
-		Console bool `yaml:"console"`
-		Slack   *struct {
+	Output struct {
+		Console  bool `yaml:"console"`
+		Slack    *struct {
 			Token     string `yaml:"token"`
 			ChannelId string `yaml:"channel_id"`
 			From      string `yaml:"from"`
 			To        string `yaml:"to"`
 		} `yaml:"slack"`
+		Telegram *struct {
+			Token  string `yaml:"token"`
+			ChatID string `yaml:"chat_id"`
+			From   string `yaml:"from"`
+			To     string `yaml:"to"`
+		} `yaml:"telegram"`
 	} `yaml:"output"`
 	Reminders *struct {
 		Check     yamlTimeCheck `yaml:"check"`
@@ -114,8 +120,9 @@ func parseConfigFile(configFilePath string) *types.Config {
 		CheckForNewVersions: config.CheckForNewVersions,
 		DBPath:              config.DBPath,
 		Output: types.Output{
-			Console: config.Output.Console,
-			Slack:   parseSlack(config),
+			Console:  config.Output.Console,
+			Slack:    parseSlack(config),
+			Telegram: parseTelegram(config),
 		},
 		Reminders:   parseReminders(config),
 		Countdown:   parseCountdown(config),
@@ -133,6 +140,18 @@ func parseSlack(config *yamlConfig) *types.Slack {
 		Token:     config.Output.Slack.Token,
 		ChannelId: config.Output.Slack.ChannelId,
 		Duration:  parseDuration(config.Output.Slack.From, config.Output.Slack.To),
+	}
+}
+
+func parseTelegram(config *yamlConfig) *types.Telegram {
+	if config.Output.Telegram == nil {
+		return nil
+	}
+
+	return &types.Telegram{
+		Token:    config.Output.Telegram.Token,
+		ChatID:   config.Output.Telegram.ChatID,
+		Duration: parseDuration(config.Output.Telegram.From, config.Output.Telegram.To),
 	}
 }
 
@@ -220,7 +239,7 @@ func parseSiteChanges(config *yamlConfig) *types.SiteChange {
 
 func parseTimeCheck(check yamlTimeCheck) types.TimeFrequencyAndDuration {
 	return types.TimeFrequencyAndDuration{
-		Frequency: utils.ParseDuarionFromString(check.Frequency),
+		Frequency: utils.ParseDurationFromString(check.Frequency),
 		Duration:  parseDuration(check.From, check.To),
 	}
 }

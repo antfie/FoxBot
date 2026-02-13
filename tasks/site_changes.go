@@ -8,6 +8,7 @@ import (
 	"os"
 	"path"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/antfie/FoxBot/crypto"
@@ -15,7 +16,12 @@ import (
 	"github.com/antfie/FoxBot/utils"
 )
 
-var processedHashes []string
+const maxProcessedHashes = 1000
+
+var (
+	processedHashes   = make(map[string]struct{})
+	processedHashesMu sync.Mutex
+)
 
 func (c *Context) SiteChanges() {
 	if c.Config.SiteChanges.Check.Duration != nil && !utils.IsWithinDuration(time.Now(), *c.Config.SiteChanges.Check.Duration) {
@@ -23,33 +29,30 @@ func (c *Context) SiteChanges() {
 	}
 
 	for _, site := range c.Config.SiteChanges.Sites {
-		go c.checkDfference(site)
+		go c.checkDifference(site)
 	}
 }
 
-func (c *Context) checkDfference(site types.SiteChangeSite) {
+func (c *Context) checkDifference(site types.SiteChangeSite) {
 	response := utils.HttpRequest("GET", site.URL, nil, nil)
 
 	if response == nil {
-		c.NotifyBad(fmt.Sprintf("checkDfference: Could not query API %s", site.URL))
+		c.NotifyBad(fmt.Sprintf("checkDifference: Could not query API %s", site.URL))
 		return
 	}
 
+	defer response.Body.Close()
+
 	if response.StatusCode != http.StatusOK {
-		c.NotifyBad(fmt.Sprintf("checkDfference: API returned status of %s for %s", response.Status, site.URL))
+		c.NotifyBad(fmt.Sprintf("checkDifference: API returned status of %s for %s", response.Status, site.URL))
 		return
 	}
 
 	body, err := io.ReadAll(response.Body)
 
 	if err != nil {
-		log.Panic(err)
-	}
-
-	err = response.Body.Close()
-
-	if err != nil {
-		log.Panic(err)
+		log.Print(err)
+		return
 	}
 
 	if len(site.ConnectionSuccessSignature) > 0 {
@@ -88,17 +91,19 @@ func (c *Context) detectHashChanges(site types.SiteChangeSite, body []byte) {
 	hash, err := crypto.HashDataToString(body)
 
 	if err != nil {
-		log.Panic(err)
+		log.Print(err)
+		return
 	}
 
 	if hash == site.Hash {
 		return
 	}
 
-	for _, processed := range processedHashes {
-		if processed == hash {
-			return
-		}
+	processedHashesMu.Lock()
+	defer processedHashesMu.Unlock()
+
+	if _, seen := processedHashes[hash]; seen {
+		return
 	}
 
 	c.NotifyGood(fmt.Sprintf("Body is different for URL: %s: %s", site.URL, hash))
@@ -109,5 +114,9 @@ func (c *Context) detectHashChanges(site types.SiteChangeSite, body []byte) {
 		log.Print(err)
 	}
 
-	processedHashes = append(processedHashes, hash)
+	if len(processedHashes) >= maxProcessedHashes {
+		processedHashes = make(map[string]struct{})
+	}
+
+	processedHashes[hash] = struct{}{}
 }

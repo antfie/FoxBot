@@ -57,7 +57,7 @@ func ParseRSSTimestampFromString(d string) time.Time {
 	return value
 }
 
-func ParseDuarionFromString(d string) time.Duration {
+func ParseDurationFromString(d string) time.Duration {
 	if strings.ToLower(d) == "hourly" {
 		return time.Hour
 	}
@@ -66,7 +66,7 @@ func ParseDuarionFromString(d string) time.Duration {
 		return time.Minute * 30
 	}
 
-	log.Panic("Invalid duation")
+	log.Panic("Invalid duration")
 	return time.Hour
 }
 

@@ -24,6 +24,19 @@ output:
     from: 08:00
     to: 18:00
 
+  # Do you want notifications via Telegram?
+  # Create a bot via @BotFather (https://core.telegram.org/bots#botfather) to get a token.
+  # To get your chat_id, message your bot then visit https://api.telegram.org/bot<token>/getUpdates
+  telegram:
+    # Set your Telegram bot token here
+    token: 123456789:ABCdefGHIjklMNOpqrsTUVwxyz
+    # The chat ID to send notifications to
+    chat_id: "000"
+    # Only send notifications between these times.
+    # If you remove these settings notifications will not be queued up.
+    from: 08:00
+    to: 18:00
+
 # Enable this for inspiration to help you keep your goals on track
 reminders:
   # How often to be reminded?

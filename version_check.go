@@ -27,6 +27,8 @@ func checkForUpdates() {
 		return
 	}
 
+	defer resp.Body.Close()
+
 	if resp.StatusCode != http.StatusOK {
 		return
 	}

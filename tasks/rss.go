@@ -17,14 +17,13 @@ import (
 const daysNewsConsideredOld = 30
 
 var rssMutex sync.Mutex
-var rssFirstRun = true
+var rssOnce sync.Once
 
 func (c *Context) RSS() {
-	if rssFirstRun {
+	rssOnce.Do(func() {
 		// Delete any old news
-		c.DB.Query(fmt.Sprintf("DELETE FROM rss WHERE created > date('now', '+%d day')", daysNewsConsideredOld))
-		rssFirstRun = false
-	}
+		c.DB.Exec(fmt.Sprintf("DELETE FROM rss WHERE created < date('now', '-%d day')", daysNewsConsideredOld))
+	})
 
 	if c.Config.RSS.Check.Duration != nil && !utils.IsWithinDuration(time.Now(), *c.Config.RSS.Check.Duration) {
 		return
@@ -103,6 +102,8 @@ func processContents(feed types.RSSFeed, url string) string {
 		return ""
 	}
 
+	defer itemResponse.Body.Close()
+
 	if itemResponse.StatusCode != http.StatusOK {
 		utils.NotifyBad(fmt.Sprintf("RSS: Article (body) returned status of %s for %s", itemResponse.Status, url))
 		return ""
@@ -113,12 +114,6 @@ func processContents(feed types.RSSFeed, url string) string {
 	if err != nil {
 		utils.NotifyBad(fmt.Sprintf("RSS: HTML parsing issue for  %s", url))
 		return ""
-	}
-
-	err = itemResponse.Body.Close()
-
-	if err != nil {
-		log.Panic(err)
 	}
 
 	contents := doc.Find(feed.HTMLTag).Text()
@@ -132,7 +127,7 @@ func processContents(feed types.RSSFeed, url string) string {
 }
 
 func isIgnored(feed types.RSSFeed, item *gofeed.Item, c *Context) bool {
-	if item.PublishedParsed.Add(time.Hour * 24 * daysNewsConsideredOld).Before(time.Now()) {
+	if item.PublishedParsed != nil && item.PublishedParsed.Add(time.Hour*24*daysNewsConsideredOld).Before(time.Now()) {
 		return true
 	}
 

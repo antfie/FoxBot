@@ -65,6 +65,9 @@ func (s *Slack) notify(message string) {
 	response := utils.HttpRequest("POST", s.url, slackHeaders, strings.NewReader(form.Encode()))
 
 	if response == nil {
-		log.Panic("Could not connect to Slack API")
+		log.Print("Could not connect to Slack API")
+		return
 	}
+
+	response.Body.Close()
 }

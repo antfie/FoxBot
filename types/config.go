@@ -11,12 +11,19 @@ type Config struct {
 }
 
 type Output struct {
-	Console bool
-	Slack   *Slack
+	Console  bool
+	Slack    *Slack
+	Telegram *Telegram
 }
 
 type Slack struct {
 	Token     string
 	ChannelId string
 	Duration  *TimeDuration
+}
+
+type Telegram struct {
+	Token    string
+	ChatID   string
+	Duration *TimeDuration
 }

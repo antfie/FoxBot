@@ -7,6 +7,7 @@ import (
 	"github.com/antfie/FoxBot/db"
 	"github.com/antfie/FoxBot/slack"
 	"github.com/antfie/FoxBot/tasks"
+	"github.com/antfie/FoxBot/telegram"
 	"github.com/antfie/FoxBot/utils"
 	"log"
 	"os"
@@ -46,6 +47,10 @@ func main() {
 
 	if c.Output.Slack != nil {
 		task.Slack = slack.NewSlack(c.Output.Slack, task.DB)
+	}
+
+	if c.Output.Telegram != nil {
+		task.Telegram = telegram.NewTelegram(c.Output.Telegram, task.DB)
 	}
 
 	var tasksToRun []*tasks.Task

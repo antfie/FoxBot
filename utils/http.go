@@ -15,7 +15,8 @@ func HttpRequest(method, url string, headers map[string]string, body io.Reader) 
 	req, err := http.NewRequest(method, url, body)
 
 	if err != nil {
-		log.Panic(err)
+		log.Print(err)
+		return nil
 	}
 
 	req.Header.Set("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:124.0) Gecko/20100101 Firefox/124.0")
