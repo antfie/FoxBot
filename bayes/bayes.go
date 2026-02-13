@@ -26,6 +26,14 @@ func (c *Classifier) Train(feedGroup, text string, relevant bool) {
 	c.db.BayesIncrementStats(feedGroup, relevant)
 }
 
+func (c *Classifier) Untrain(feedGroup, text string, relevant bool) {
+	for _, word := range Tokenize(text) {
+		c.db.BayesDecrementWord(feedGroup, word, relevant)
+	}
+
+	c.db.BayesDecrementStats(feedGroup, relevant)
+}
+
 func (c *Classifier) Score(feedGroup, text string) float64 {
 	words := Tokenize(text)
 

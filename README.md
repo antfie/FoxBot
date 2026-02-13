@@ -13,10 +13,13 @@ If a fox was a robot it would be fantastic. This is your very own personal robot
 ## What Can It Do?
 
 * Poll your RSS feeds and notify you of relevant topics
+* **Learn what you care about** — a built-in Naive Bayes classifier learns from your feedback to filter out noise and surface the articles that matter to you
 * Detect changes to websites you care about
 * Daily reminders throughout the day about things to be mindful of, like drinking water
 * Countdown timers
 * Deliver notifications via console, Slack, or Telegram
+
+> **Tip:** For the best experience, use Telegram. RSS notifications come with inline 👍/👎 buttons that train the classifier to understand your preferences. Over time FoxBot learns which topics you care about and suppresses the rest — no cloud services, no data leaving your device. See [Intelligence](docs/intelligence.md) for details.
 
 ## How Do I Run It?
 
@@ -50,6 +53,7 @@ A [config.yaml](https://github.com/antfie/FoxBot/blob/main/config.yaml) file wil
 | Document | Description |
 |----------|-------------|
 | [Configuration Guide](docs/configuration.md) | All config options, keyword matching, feed groups |
+| [Intelligence](docs/intelligence.md) | How the Naive Bayes classifier learns from your feedback |
 | [Architecture](docs/architecture.md) | System design, data flow diagrams, package structure |
 | [Deployment Guide](docs/deployment.md) | Docker, systemd, Raspberry Pi, building from source |
 

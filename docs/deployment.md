@@ -122,7 +122,7 @@ FoxBot creates these files in its working directory:
 | File | Purpose |
 |------|---------|
 | `config.yaml` | Configuration (created on first run if missing) |
-| `data.db` | SQLite database (notification queues, seen RSS links) |
+| `data.db` | SQLite database (notification queues, seen RSS links, trained classifier model) |
 | `data/` | Saved snapshots from site change detection |
 
-Back up `config.yaml` and optionally `data.db`. The database can be safely deleted — it will be recreated on next startup (you may get duplicate RSS notifications for already-seen items).
+Back up `config.yaml` and `data.db`. The database contains your trained Bayes classifier model — deleting it means the classifier will need to be retrained from scratch via Telegram feedback. You may also get duplicate RSS notifications for already-seen items.

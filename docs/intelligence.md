@@ -1,8 +1,16 @@
 # Intelligence: Local Feed Filtering
 
+## Why Telegram?
+
+FoxBot works with console, Slack, and Telegram — but **Telegram unlocks the full intelligence system**. When FoxBot sends you an RSS notification on Telegram, it attaches inline 👍/👎 buttons. Tap one and the built-in Naive Bayes classifier immediately learns from your feedback. Over time it understands which topics you care about and automatically suppresses the noise.
+
+This all runs locally on your device. No data is sent to any cloud service, no API keys for third-party ML platforms, no external dependencies. Just a lightweight classifier stored in the same SQLite database FoxBot already uses.
+
+Slack users still benefit from keyword matching and the `keyword_only` filter (see below), but without Telegram the classifier has no way to learn.
+
 ## Problem
 
-FoxBot monitors ~25 RSS feeds and multiple websites. Keyword matching alone produces noisy results — either too many notifications or missed articles that don't contain exact keywords. The goal is to learn what the user actually cares about and suppress irrelevant items automatically.
+FoxBot monitors RSS feeds and websites. Keyword matching alone produces noisy results — either too many notifications or missed articles that don't contain exact keywords. The goal is to learn what the user actually cares about and suppress irrelevant items automatically.
 
 ## Hardware Constraints
 
@@ -40,30 +48,59 @@ When FoxBot sends a Telegram notification for an RSS item, it attaches two inlin
 
 The classifier requires 30 labelled articles per feed group before it starts scoring. Until then, all articles are sent through for training.
 
+Feedback is optional — you don't have to tap a button on every article. The classifier learns from whatever feedback you provide. If you only tap 👎 on things you don't want, it still learns. If you tap 👍 on things you enjoy, it gets better at surfacing similar items.
+
+Duplicate presses of the same button are ignored. If you change your mind (e.g. tap 👍 then 👎), the old label is untrained and the new one is applied — only the last action counts.
+
 ### Per-Group Models
 
-Separate classifiers are trained for each feed group (BBC, Security, etc.) since relevance criteria differ across topics. An untrained group has no effect on a trained one.
+Separate classifiers are trained for each feed group (BBC, Security, etc.) since relevance criteria differ across topics. An untrained group has no effect on a trained one. If an article appears in multiple feed groups it is scored independently in each.
 
 ### Keywords as Hard Override
 
 Keywords always punch through regardless of Bayes score. This handles the scenario where you've trained the model to suppress articles about a topic, but still want to know about exceptional events (e.g. "dies", "BREAKING", "ransomware"). The keyword list shifts from "topics I follow" to "events that always matter regardless of context."
 
+## keyword_only Mode (Slack)
+
+For Slack users who don't have Telegram's feedback buttons, the `keyword_only` setting provides a simpler filter:
+
+- When `keyword_only: true` on a feed group, only keyword matches are sent to Slack
+- Telegram still receives all items (with feedback buttons) for classifier training
+- Console still receives everything
+
+This is useful for high-volume feeds where you only want Slack pings about specific topics while Telegram handles the full feed with intelligent filtering.
+
 ## Notification Decision Flow
 
 ```
 RSS Article
-  │
-  ├── Title keyword match? ──→ Always notify all channels (with feedback buttons)
-  │
-  ├── HTML body keyword match? ──→ Always notify all channels (with feedback buttons)
-  │
-  └── No keyword match:
-        ├── Bayes ready (≥30 labelled articles for this feed group)?
-        │   ├── Score > 0.5 ──→ Notify all channels (with feedback buttons)
-        │   └── Score ≤ 0.5 ──→ Console only (suppressed)
-        │
-        └── Bayes NOT ready ──→ Notify all channels (with feedback buttons, for training)
+  |
+  +-- Title keyword match? --> Always notify all channels (with feedback buttons)
+  |
+  +-- HTML body keyword match? --> Always notify all channels (with feedback buttons)
+  |
+  +-- No keyword match:
+        +-- Bayes ready (>=30 labelled articles for this feed group)?
+        |   +-- Score > 0.5 --> Notify all channels (with feedback buttons)
+        |   +-- Score <= 0.5 --> Console only (suppressed)
+        |
+        +-- Bayes NOT ready --> Notify all channels (with feedback buttons, for training)
+
+Slack filter (applied on top):
+  keyword_only: true --> Slack only receives keyword matches
+  keyword_only: false --> Slack receives everything that passes the above flow
 ```
+
+## Polite RSS Fetching
+
+FoxBot is a good citizen of the RSS ecosystem. It implements conditional HTTP requests to minimise bandwidth and server load:
+
+- **ETag / If-None-Match**: If a feed server returns an `ETag` header, FoxBot stores it and sends `If-None-Match` on the next request. If the feed hasn't changed, the server returns `304 Not Modified` with no body.
+- **Last-Modified / If-Modified-Since**: Same principle using the `Last-Modified` header.
+- **429 Too Many Requests**: If a server returns 429, FoxBot backs off and does not count it as a failure.
+- **Failure tracking**: Consecutive failures per feed are counted. After 10 consecutive failures FoxBot sends a notification so you know a feed is broken. The counter resets on any successful fetch.
+
+Cache headers and failure counters are stored in SQLite and survive restarts.
 
 ## Telegram Feedback: Polling, Not Webhooks
 
@@ -89,27 +126,27 @@ GET https://api.telegram.org/bot{TOKEN}/getUpdates?offset={LAST_UPDATE_ID+1}&tim
 
 RSS notifications are sent individually (not batched) with a `reply_markup` parameter containing inline keyboard buttons. Each button's `callback_data` contains a prefix (`r:` for relevant, `i:` for irrelevant) and a 10-character SHA256 hash of the article URL.
 
+Non-RSS notifications (reminders, countdowns, site changes) continue through the existing batched Telegram queue without feedback buttons.
+
 ### Feedback Processor
 
 A background goroutine polls `getUpdates` every 30 seconds:
 
 ```
 Telegram Feedback Processor (every 30s)
-  ├── GET /getUpdates?offset=N
-  ├── For each CallbackQuery:
-  │   ├── Parse callback_data → (relevant/irrelevant, article_hash)
-  │   ├── Look up article text from DB
-  │   ├── Train classifier with (text, label)
-  │   ├── POST /answerCallbackQuery
-  │   └── Update stored offset
-  └── Save offset to DB
+  +-- GET /getUpdates?offset=N
+  +-- For each CallbackQuery:
+  |   +-- Parse callback_data -> (relevant/irrelevant, article_hash)
+  |   +-- Look up article text from DB
+  |   +-- Train classifier with (text, label)
+  |   +-- POST /answerCallbackQuery
+  |   +-- Update stored offset
+  +-- Save offset to DB
 ```
-
-Non-RSS notifications (reminders, countdowns, site changes) continue through the existing batched Telegram queue without feedback buttons.
 
 ## Database Schema
 
-Migration `005.sql` adds four tables:
+Migration `005.sql` adds the Bayes and Telegram state tables. Migration `006.sql` adds the HTTP cache table.
 
 ```sql
 -- Word frequencies per class per feed group (the trained model)
@@ -141,14 +178,22 @@ CREATE TABLE telegram_state (
     key   TEXT PRIMARY KEY,
     value TEXT NOT NULL
 );
+
+-- Conditional HTTP request cache and failure tracking
+CREATE TABLE http_cache (
+    url            TEXT PRIMARY KEY,
+    etag           TEXT NOT NULL DEFAULT '',
+    last_modified  TEXT NOT NULL DEFAULT '',
+    fail_count     INTEGER NOT NULL DEFAULT 0
+);
 ```
 
 ## Package Structure
 
 ```
 bayes/
-  bayes.go       — Classifier (Train, Score, IsReady) + Tokenize
-  bayes_test.go  — Unit tests (100% coverage)
+  bayes.go       -- Classifier (Train, Score, IsReady) + Tokenize
+  bayes_test.go  -- Unit tests
 ```
 
 The classifier reads/writes through the existing `db` package. No external ML libraries.

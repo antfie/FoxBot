@@ -209,7 +209,7 @@ func (t *Telegram) processCallback(query *telegramCallbackQuery) {
 	prefix := data[0]
 	hash := data[2:]
 
-	feedGroup, title, found := t.db.BayesGetArticle(hash)
+	feedGroup, title, currentLabel, found := t.db.BayesGetArticle(hash)
 
 	if !found {
 		log.Printf("Bayes article not found for hash: %s", hash)
@@ -217,14 +217,27 @@ func (t *Telegram) processCallback(query *telegramCallbackQuery) {
 		return
 	}
 
-	relevant := prefix == 'r'
-	t.bayes.Train(feedGroup, title, relevant)
-
-	label := "irrelevant"
-	if relevant {
-		label = "relevant"
+	newLabel := "irrelevant"
+	if prefix == 'r' {
+		newLabel = "relevant"
 	}
-	log.Printf("Bayes trained [%s] as %s: %s", feedGroup, label, title)
+
+	// Same button pressed again — ignore duplicate
+	if currentLabel == newLabel {
+		t.answerCallback(query.ID)
+		return
+	}
+
+	// Changed mind — untrain old label first
+	if len(currentLabel) > 0 {
+		t.bayes.Untrain(feedGroup, title, currentLabel == "relevant")
+	}
+
+	// Train with new label
+	t.bayes.Train(feedGroup, title, prefix == 'r')
+	t.db.BayesSetArticleLabel(hash, newLabel)
+
+	log.Printf("Bayes trained [%s] as %s: %s", feedGroup, newLabel, title)
 
 	t.answerCallback(query.ID)
 }

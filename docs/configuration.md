@@ -48,6 +48,8 @@ When `from`/`to` are set, messages are queued in SQLite and held until the time 
 
 **Setting up Telegram:** Message [@BotFather](https://core.telegram.org/bots#botfather) to create a bot and get a token. Then message your bot and visit `https://api.telegram.org/bot<token>/getUpdates` to find your `chat_id`.
 
+> **Recommended:** Telegram is the best output for RSS feeds. Each RSS notification includes inline feedback buttons that train the built-in Naive Bayes classifier to learn what you care about. Over time, irrelevant articles are automatically suppressed. See [Intelligence](intelligence.md) for details.
+
 ### Reminders
 
 Cycle through a shuffled list of motivational reminders.
@@ -124,13 +126,15 @@ Keywords are checked in two stages:
 
 If either stage finds a match, the notification is marked with a `🚨` alert.
 
-#### keyword_only Mode
+#### keyword_only Mode (Slack)
 
-When `keyword_only: true` is set on a feed group:
-- Keyword matches go to **all outputs** (console, Slack, Telegram) with `🚨`
-- Non-matching items go to **console only**
+The `keyword_only` setting controls Slack notification filtering:
 
-This is useful for high-volume feeds where you only want to be pinged about specific topics.
+- When `keyword_only: true` on a feed group, only keyword matches are sent to **Slack**
+- **Telegram** still receives all items (with feedback buttons for classifier training)
+- **Console** still receives everything
+
+This is useful for high-volume feeds where you only want Slack pings about specific topics while Telegram handles the full feed with intelligent filtering. Default is `false`.
 
 #### ignore_url_signatures
 

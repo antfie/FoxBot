@@ -74,6 +74,8 @@ rss:
     - FoxBot
   feeds:
   - group: BBC
+    # Only send keyword matches to Slack (Telegram still receives all items for Bayes training)
+    keyword_only: false
     html:
         tags:
           - main

@@ -81,18 +81,18 @@ func (c *Context) processRSSFeed(feed types.RSSFeed) {
 
 		if len(foundKeyword) > 0 {
 			// Keyword match - always notify all channels
-			c.notifyRSS(fmt.Sprintf("📰 🚨 %s", message), feed.Group, item.Link, true)
+			c.notifyRSS(fmt.Sprintf("📰 🚨 %s", message), feed.Group, item.Link, true, feed.KeywordOnly)
 		} else if c.Bayes != nil && c.Bayes.IsReady(feed.Group) {
 			// Bayes has enough data - let it decide
 			score := c.Bayes.Score(feed.Group, item.Title)
 			if score > 0.5 {
-				c.notifyRSS(fmt.Sprintf("📰 %s", message), feed.Group, item.Link, false)
+				c.notifyRSS(fmt.Sprintf("📰 %s", message), feed.Group, item.Link, false, feed.KeywordOnly)
 			} else {
 				utils.NotifyConsole(fmt.Sprintf("📰 %s", message))
 			}
 		} else {
 			// Bayes not ready - send everything for training
-			c.notifyRSS(fmt.Sprintf("📰 %s", message), feed.Group, item.Link, false)
+			c.notifyRSS(fmt.Sprintf("📰 %s", message), feed.Group, item.Link, false, feed.KeywordOnly)
 		}
 	}
 }
@@ -144,7 +144,7 @@ func articleHash(link string) string {
 	return hex.EncodeToString(h[:5]) // 10 hex chars
 }
 
-func (c *Context) notifyRSS(message, feedGroup, link string, isGood bool) {
+func (c *Context) notifyRSS(message, feedGroup, link string, isGood, keywordOnly bool) {
 	if c.Config.Output.Console {
 		if isGood {
 			utils.NotifyConsoleGood(message)
@@ -153,7 +153,7 @@ func (c *Context) notifyRSS(message, feedGroup, link string, isGood bool) {
 		}
 	}
 
-	if c.Slack != nil {
+	if c.Slack != nil && (!keywordOnly || isGood) {
 		c.DB.QueueSlackNotification(message)
 	}
 

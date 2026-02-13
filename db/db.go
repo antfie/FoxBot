@@ -249,6 +249,28 @@ func (db *DB) BayesIncrementStats(feedGroup string, relevant bool) {
 	}
 }
 
+func (db *DB) BayesDecrementWord(feedGroup, word string, relevant bool) {
+	db.mu.Lock()
+	defer db.mu.Unlock()
+
+	if relevant {
+		db.insert("UPDATE bayes_model SET relevant = MAX(relevant - 1, 0) WHERE feed_group = ? AND word = ?", feedGroup, word)
+	} else {
+		db.insert("UPDATE bayes_model SET irrelevant = MAX(irrelevant - 1, 0) WHERE feed_group = ? AND word = ?", feedGroup, word)
+	}
+}
+
+func (db *DB) BayesDecrementStats(feedGroup string, relevant bool) {
+	db.mu.Lock()
+	defer db.mu.Unlock()
+
+	if relevant {
+		db.insert("UPDATE bayes_stats SET relevant = MAX(relevant - 1, 0) WHERE feed_group = ?", feedGroup)
+	} else {
+		db.insert("UPDATE bayes_stats SET irrelevant = MAX(irrelevant - 1, 0) WHERE feed_group = ?", feedGroup)
+	}
+}
+
 func (db *DB) BayesGetStats(feedGroup string) (int, int) {
 	db.mu.Lock()
 	defer db.mu.Unlock()
@@ -272,20 +294,26 @@ func (db *DB) BayesSaveArticle(hash, feedGroup, title string) {
 	db.insert("INSERT OR IGNORE INTO bayes_article (hash, feed_group, title) VALUES (?, ?, ?)", hash, feedGroup, title)
 }
 
-func (db *DB) BayesGetArticle(hash string) (string, string, bool) {
+func (db *DB) BayesGetArticle(hash string) (feedGroup, title, label string, found bool) {
 	db.mu.Lock()
 	defer db.mu.Unlock()
 
-	row := db.db.QueryRow("SELECT feed_group, title FROM bayes_article WHERE hash = ?", hash)
+	row := db.db.QueryRow("SELECT feed_group, title, COALESCE(label, '') FROM bayes_article WHERE hash = ?", hash)
 
-	var feedGroup, title string
-	err := row.Scan(&feedGroup, &title)
+	err := row.Scan(&feedGroup, &title, &label)
 
 	if err != nil {
-		return "", "", false
+		return "", "", "", false
 	}
 
-	return feedGroup, title, true
+	return feedGroup, title, label, true
+}
+
+func (db *DB) BayesSetArticleLabel(hash, label string) {
+	db.mu.Lock()
+	defer db.mu.Unlock()
+
+	db.insert("UPDATE bayes_article SET label = ? WHERE hash = ?", label, hash)
 }
 
 func (db *DB) BayesCleanupOldArticles() {
