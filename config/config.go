@@ -53,7 +53,7 @@ type yamlConfig struct {
 			ImportantKeywords   []string `yaml:"important_keywords"`
 			IgnoreURLSignatures []string `yaml:"ignore_url_signatures"`
 			HTML                struct {
-				ContentTag          string   `yaml:"tag"`
+				ContentTags         []string `yaml:"tags"`
 				ImportantKeywords   []string `yaml:"important_keywords"`
 				IgnoreURLSignatures []string `yaml:"ignore_url_signatures"`
 			} `yaml:"html"`
@@ -202,7 +202,7 @@ func parseRSS(config *yamlConfig) *types.RSS {
 				IgnoreURLSignatures:     rssGroup.IgnoreURLSignatures,
 				Name:                    rssFeed.Name,
 				URL:                     rssFeed.URL,
-				HTMLContentTag:          rssGroup.HTML.ContentTag,
+				HTMLContentTags:         rssGroup.HTML.ContentTags,
 				HTMLImportantKeywords:   rssGroup.HTML.ImportantKeywords,
 				HTMLIgnoreURLSignatures: rssGroup.HTML.IgnoreURLSignatures,
 			})

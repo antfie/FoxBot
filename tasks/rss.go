@@ -82,7 +82,7 @@ func (c *Context) processRSSFeed(feed types.RSSFeed) {
 }
 
 func processContents(feed types.RSSFeed, url string) string {
-	if len(feed.HTMLContentTag) < 1 {
+	if len(feed.HTMLContentTags) < 1 {
 		return ""
 	}
 
@@ -113,7 +113,7 @@ func processContents(feed types.RSSFeed, url string) string {
 		return ""
 	}
 
-	contents := doc.Find(feed.HTMLContentTag).Text()
+	contents := doc.Find(strings.Join(feed.HTMLContentTags, ", ")).Text()
 
 	if len(contents) < 1 {
 		log.Printf("RSS: Could not find HTML contents %s", url)

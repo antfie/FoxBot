@@ -75,7 +75,8 @@ rss:
   feeds:
   - group: BBC
     html:
-        tag: main
+        tags:
+          - main
         important_keywords:
           - breaking news story
         ignore_url_signatures:

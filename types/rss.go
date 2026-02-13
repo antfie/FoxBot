@@ -11,7 +11,7 @@ type RSSFeed struct {
 	IgnoreURLSignatures     []string
 	Name                    string
 	URL                     string
-	HTMLContentTag          string
+	HTMLContentTags         []string
 	HTMLImportantKeywords   []string
 	HTMLIgnoreURLSignatures []string
 }
