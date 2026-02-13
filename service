@@ -6,8 +6,8 @@ StartLimitIntervalSec=60
 
 [Service]
 Type=simple
-User=FoxBot
-Group=FoxBot
+User=foxbot-service
+Group=foxbot-service
 WorkingDirectory=/opt/FoxBot
 ExecStart=/opt/FoxBot/FoxBot
 
