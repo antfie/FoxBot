@@ -38,11 +38,14 @@ func (c *Context) RSS() {
 }
 
 func (c *Context) processRSSFeed(feed types.RSSFeed) {
-	fp := gofeed.NewParser()
-	parsedFeed, err := fp.ParseURL(feed.URL)
+	parsedFeed, err := c.fetchFeed(feed.URL)
 
 	if err != nil {
-		utils.NotifyBad(fmt.Sprintf("Could not process feed: %s", feed.URL))
+		return
+	}
+
+	if parsedFeed == nil {
+		// 304 Not Modified
 		return
 	}
 
@@ -69,7 +72,7 @@ func (c *Context) processRSSFeed(feed types.RSSFeed) {
 
 		// No title keyword found so look at the contents of the link
 		if len(foundKeyword) == 0 {
-			foundKeyword = processContents(feed, formattedLink)
+			foundKeyword = c.processContents(feed, formattedLink)
 
 			if len(foundKeyword) > 0 {
 				message = fmt.Sprintf("[%s]: %s *%s* - <%s>", formattedName, item.Title, foundKeyword, formattedLink)
@@ -94,7 +97,7 @@ func (c *Context) processRSSFeed(feed types.RSSFeed) {
 	}
 }
 
-func processContents(feed types.RSSFeed, url string) string {
+func (c *Context) processContents(feed types.RSSFeed, url string) string {
 	if len(feed.HTMLContentTags) < 1 {
 		return ""
 	}
@@ -108,21 +111,21 @@ func processContents(feed types.RSSFeed, url string) string {
 	itemResponse := utils.HttpRequest("GET", url, nil, nil)
 
 	if itemResponse == nil {
-		utils.NotifyBad(fmt.Sprintf("RSS: Could not query  %s", url))
+		c.NotifyBad(fmt.Sprintf("RSS: Could not query %s", url))
 		return ""
 	}
 
 	defer itemResponse.Body.Close()
 
 	if itemResponse.StatusCode != http.StatusOK {
-		utils.NotifyBad(fmt.Sprintf("RSS: Article (body) returned status of %s for %s", itemResponse.Status, url))
+		c.NotifyBad(fmt.Sprintf("RSS: Article (body) returned status of %s for %s", itemResponse.Status, url))
 		return ""
 	}
 
 	doc, err := goquery.NewDocumentFromReader(itemResponse.Body)
 
 	if err != nil {
-		utils.NotifyBad(fmt.Sprintf("RSS: HTML parsing issue for  %s", url))
+		c.NotifyBad(fmt.Sprintf("RSS: HTML parsing issue for %s", url))
 		return ""
 	}
 
@@ -180,4 +183,81 @@ func isIgnored(feed types.RSSFeed, item *gofeed.Item, c *Context) bool {
 	}
 
 	return false
+}
+
+const feedFailureThreshold = 10
+
+func (c *Context) fetchFeed(feedURL string) (*gofeed.Feed, error) {
+	etag, lastModified, _ := c.DB.GetHTTPCache(feedURL)
+
+	headers := map[string]string{}
+
+	if len(etag) > 0 {
+		headers["If-None-Match"] = etag
+	}
+
+	if len(lastModified) > 0 {
+		headers["If-Modified-Since"] = lastModified
+	}
+
+	response := utils.HttpRequest("GET", feedURL, headers, nil)
+
+	if response == nil {
+		failCount := c.DB.IncrementHTTPCacheFailCount(feedURL)
+
+		if failCount == feedFailureThreshold {
+			c.NotifyBad(fmt.Sprintf("RSS feed has failed %d times: %s", failCount, feedURL))
+		}
+
+		log.Printf("Could not fetch feed: %s", feedURL)
+		return nil, fmt.Errorf("could not fetch feed: %s", feedURL)
+	}
+
+	defer func() {
+		if err := response.Body.Close(); err != nil {
+			log.Print(err)
+		}
+	}()
+
+	if response.StatusCode == http.StatusNotModified {
+		c.DB.SetHTTPCache(feedURL, etag, lastModified)
+		return nil, nil
+	}
+
+	if response.StatusCode == http.StatusTooManyRequests {
+		log.Printf("RSS feed returned 429 Too Many Requests: %s", feedURL)
+		return nil, fmt.Errorf("rate limited: %s", feedURL)
+	}
+
+	if response.StatusCode != http.StatusOK {
+		failCount := c.DB.IncrementHTTPCacheFailCount(feedURL)
+
+		if failCount == feedFailureThreshold {
+			c.NotifyBad(fmt.Sprintf("RSS feed has failed %d times (last status: %s): %s", failCount, response.Status, feedURL))
+		}
+
+		log.Printf("RSS feed returned status %s: %s", response.Status, feedURL)
+		return nil, fmt.Errorf("bad status %s: %s", response.Status, feedURL)
+	}
+
+	// Success - store cache headers and reset fail counter
+	newEtag := response.Header.Get("ETag")
+	newLastModified := response.Header.Get("Last-Modified")
+	c.DB.SetHTTPCache(feedURL, newEtag, newLastModified)
+
+	fp := gofeed.NewParser()
+	parsedFeed, err := fp.Parse(response.Body)
+
+	if err != nil {
+		failCount := c.DB.IncrementHTTPCacheFailCount(feedURL)
+
+		if failCount == feedFailureThreshold {
+			c.NotifyBad(fmt.Sprintf("RSS feed has failed %d times (parse error): %s", failCount, feedURL))
+		}
+
+		log.Printf("Could not parse feed: %s", feedURL)
+		return nil, fmt.Errorf("could not parse feed: %s", feedURL)
+	}
+
+	return parsedFeed, nil
 }

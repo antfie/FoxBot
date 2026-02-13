@@ -322,6 +322,48 @@ func (db *DB) SetTelegramState(key, value string) {
 	db.insert("INSERT INTO telegram_state (key, value) VALUES (?, ?) ON CONFLICT(key) DO UPDATE SET value = ?", key, value, value)
 }
 
+// HTTP cache methods
+
+func (db *DB) GetHTTPCache(url string) (etag, lastModified string, failCount int) {
+	db.mu.Lock()
+	defer db.mu.Unlock()
+
+	row := db.db.QueryRow("SELECT etag, last_modified, fail_count FROM http_cache WHERE url = ?", url)
+
+	err := row.Scan(&etag, &lastModified, &failCount)
+
+	if err != nil {
+		return "", "", 0
+	}
+
+	return etag, lastModified, failCount
+}
+
+func (db *DB) SetHTTPCache(url, etag, lastModified string) {
+	db.mu.Lock()
+	defer db.mu.Unlock()
+
+	db.insert("INSERT INTO http_cache (url, etag, last_modified, fail_count) VALUES (?, ?, ?, 0) ON CONFLICT(url) DO UPDATE SET etag = ?, last_modified = ?, fail_count = 0", url, etag, lastModified, etag, lastModified)
+}
+
+func (db *DB) IncrementHTTPCacheFailCount(url string) int {
+	db.mu.Lock()
+	defer db.mu.Unlock()
+
+	db.insert("INSERT INTO http_cache (url, fail_count) VALUES (?, 1) ON CONFLICT(url) DO UPDATE SET fail_count = fail_count + 1", url)
+
+	row := db.db.QueryRow("SELECT fail_count FROM http_cache WHERE url = ?", url)
+
+	var failCount int
+	err := row.Scan(&failCount)
+
+	if err != nil {
+		return 0
+	}
+
+	return failCount
+}
+
 func (db *DB) ConsumeSlackNotificationQueue() []string {
 	db.mu.Lock()
 	defer db.mu.Unlock()
