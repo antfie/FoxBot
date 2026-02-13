@@ -62,17 +62,17 @@ func (c *Context) checkDifference(site types.SiteChangeSite) {
 		}
 	}
 
-	lowerCaseBody := strings.ToLower(string(body))
+	bodyString := string(body)
 
 	if len(site.KeywordsToFind) > 0 {
-		for _, keyword := range site.KeywordsToFind {
-			if strings.Contains(lowerCaseBody, strings.ToLower(keyword)) {
-				c.NotifyGood(fmt.Sprintf("Keyword \"%s\" found for URL: %s", keyword, site.URL))
-			}
+		foundKeyword := utils.StringContainsWordIgnoreCase(bodyString, site.KeywordsToFind)
+		if len(foundKeyword) > 0 {
+			c.NotifyGood(fmt.Sprintf("Keyword \"%s\" found for URL: %s", foundKeyword, site.URL))
 		}
 	}
 
 	if len(site.PhrasesThatMightChange) > 0 {
+		lowerCaseBody := strings.ToLower(bodyString)
 		for _, phrase := range site.PhrasesThatMightChange {
 			if !strings.Contains(lowerCaseBody, strings.ToLower(phrase)) {
 				c.NotifyGood(fmt.Sprintf("Phrase \"%s\" not found for URL: %s", phrase, site.URL))

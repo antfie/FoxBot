@@ -30,8 +30,10 @@ output:
   telegram:
     # Set your Telegram bot token here
     token: 123456789:ABCdefGHIjklMNOpqrsTUVwxyz
+
     # The chat ID to send notifications to
     chat_id: "000"
+
     # Only send notifications between these times.
     # If you remove these settings notifications will not be queued up.
     from: 08:00

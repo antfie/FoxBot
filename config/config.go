@@ -18,9 +18,9 @@ type yamlTimeCheck struct {
 type yamlConfig struct {
 	CheckForNewVersions bool   `yaml:"check_for_new_versions"`
 	DBPath              string `yaml:"db_path"`
-	Output struct {
-		Console  bool `yaml:"console"`
-		Slack    *struct {
+	Output              struct {
+		Console bool `yaml:"console"`
+		Slack   *struct {
 			Token     string `yaml:"token"`
 			ChannelId string `yaml:"channel_id"`
 			From      string `yaml:"from"`
