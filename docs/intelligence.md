@@ -148,6 +148,7 @@ CREATE TABLE telegram_state (
 ```
 bayes/
   bayes.go       — Classifier (Train, Score, IsReady) + Tokenize
+  bayes_test.go  — Unit tests (100% coverage)
 ```
 
 The classifier reads/writes through the existing `db` package. No external ML libraries.
