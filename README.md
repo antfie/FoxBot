@@ -8,7 +8,9 @@
 
 # Introducing FoxBot
 
-If a fox was a robot it would be fantastic. This is your very own personal robot, because you are fantastic. FoxBot is your AI-free* personal assistant, diligently doing your chores in the background and letting you know about things important to you. *AI has been used to build the robot, but is not used at runtime.
+If a fox was a robot it would be fantastic. This is your very own personal robot, because you are fantastic. FoxBot is your AI-free[^1] personal assistant, diligently doing your chores in the background and letting you know about things important to you.
+
+[^1]: AI has been used to help build the robot, but there is no AI usage at runtime.
 
 ## What Can It Do?
 
