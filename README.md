@@ -12,10 +12,11 @@ If a fox was a robot it would be fantastic. This is your very own personal robot
 
 ## What Can It Do?
 
-* Poll your RSS feeds and notify you of relvent topics
+* Poll your RSS feeds and notify you of relevant topics
 * Detect changes to websites you care about
 * Daily reminders throughout the day about things to be mindful of, like drinking water
 * Countdown timers
+* Deliver notifications via console, Slack, or Telegram
 
 ## How Do I Run It?
 
@@ -28,19 +29,36 @@ docker pull antfie/foxbot
 docker run --rm -it -v "$(pwd):/app" antfie/foxbot
 ```
 
+See the [Deployment Guide](docs/deployment.md) for systemd, Raspberry Pi, and other options.
+
 ## What Does It Look Like?
 
 In the console you would see something like this:
 
 ![console.png](docs/images/console.png)
 
-However FoxBot really shines when you use it as a Slack bot:
+However FoxBot really shines when you use it as a Slack or Telegram bot:
 
 ![slack.png](docs/images/slack.png)
 
 ## How Do I Configure It?
 
-There is a [config.yaml](https://github.com/antfie/FoxBot/blob/main/config.yaml) file which will be generated on first run.
+A [config.yaml](https://github.com/antfie/FoxBot/blob/main/config.yaml) file will be generated on first run. See the [Configuration Guide](docs/configuration.md) for full details on all settings.
+
+## Documentation
+
+| Document | Description |
+|----------|-------------|
+| [Configuration Guide](docs/configuration.md) | All config options, keyword matching, feed groups |
+| [Architecture](docs/architecture.md) | System design, data flow diagrams, package structure |
+| [Deployment Guide](docs/deployment.md) | Docker, systemd, Raspberry Pi, building from source |
+
+## Running Locally
+
+```bash
+git clone https://github.com/antfie/FoxBot.git
+go run github.com/antfie/FoxBot
+```
 
 ## How Can I Support This?
 
@@ -49,13 +67,6 @@ I welcome bug reports, fixes, features and donations to keep this going.
 <p>
     <a href="https://www.buymeacoffee.com/antfie" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" "height="60" width="217"></a>
 </p>
-
-## Running locally
-
-```bash
-git clone https://github.com/antfie/FoxBot.git
-go run github.com/antfie/FoxBot
-```
 
 ## Premium Features
 
@@ -67,10 +78,7 @@ If you need custom features, integrations or support we can help. Just email us 
 
 The following is a non-commital list of items we want to work through:
 
-- Document how to deploy to Raspberry Pi
-- Document the configuration file
 - Speed test functionality, ping, ICMP
-- Reduce noises and notifications at night when sleeping
 - Consider daily summaries instead of regular updates
 - Solar panel monitoring
 - Weather
@@ -78,4 +86,4 @@ The following is a non-commital list of items we want to work through:
 
 # Credits
 
-FotBot was created by Anthony Fielding. Alert sounds by [Material Design](https://m2.material.io/design/sound/sound-resources.html) (Google), which are licenced under [CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/legalcode).
+FoxBot was created by Anthony Fielding. Alert sounds by [Material Design](https://m2.material.io/design/sound/sound-resources.html) (Google), which are licenced under [CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/legalcode).
