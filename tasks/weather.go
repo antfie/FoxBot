@@ -6,6 +6,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/antfie/FoxBot/types"
@@ -18,7 +19,12 @@ type openMeteoResponse struct {
 		TemperatureMin       []float64 `json:"temperature_2m_min"`
 		PrecipitationProbMax []int     `json:"precipitation_probability_max"`
 		WeatherCode          []int     `json:"weather_code"`
+		WindSpeedMax         []float64 `json:"wind_speed_10m_max"`
 	} `json:"daily"`
+	Hourly struct {
+		Temperature []float64 `json:"temperature_2m"`
+		WeatherCode []int     `json:"weather_code"`
+	} `json:"hourly"`
 }
 
 func (c *Context) Weather() {
@@ -37,7 +43,7 @@ func (c *Context) fetchWeather(location types.WeatherLocation) {
 	}
 
 	url := fmt.Sprintf(
-		"https://api.open-meteo.com/v1/forecast?latitude=%.4f&longitude=%.4f&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max,weather_code&timezone=auto&forecast_days=1",
+		"https://api.open-meteo.com/v1/forecast?latitude=%.4f&longitude=%.4f&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max,weather_code,wind_speed_10m_max&hourly=temperature_2m,weather_code&timezone=auto&forecast_days=1",
 		location.Latitude,
 		location.Longitude,
 	)
@@ -72,25 +78,51 @@ func (c *Context) fetchWeather(location types.WeatherLocation) {
 	}
 
 	if len(data.Daily.TemperatureMax) < 1 || len(data.Daily.TemperatureMin) < 1 ||
-		len(data.Daily.PrecipitationProbMax) < 1 || len(data.Daily.WeatherCode) < 1 {
+		len(data.Daily.PrecipitationProbMax) < 1 || len(data.Daily.WeatherCode) < 1 ||
+		len(data.Daily.WindSpeedMax) < 1 {
 		log.Printf("Weather: Incomplete data for %s", location.Name)
 		return
 	}
 
-	condition := weatherCodeToDescription(data.Daily.WeatherCode[0])
-	emoji := weatherCodeToEmoji(data.Daily.WeatherCode[0])
+	if len(data.Hourly.Temperature) < 24 || len(data.Hourly.WeatherCode) < 24 {
+		log.Printf("Weather: Incomplete hourly data for %s", location.Name)
+		return
+	}
 
-	message := fmt.Sprintf("%s %s: %.0f°C / %.0f°C, %s, %d%% chance of rain",
-		emoji,
-		location.Name,
-		data.Daily.TemperatureMax[0],
-		data.Daily.TemperatureMin[0],
-		condition,
-		data.Daily.PrecipitationProbMax[0],
-	)
+	message := formatWeatherForecast(location.Name, data)
 
 	c.Notify(message)
 	c.DB.SetWeatherNotified(location.Name)
+}
+
+func formatWeatherForecast(name string, data openMeteoResponse) string {
+	emoji := weatherCodeToEmoji(data.Daily.WeatherCode[0])
+
+	// Hourly indices: 8=8am (morning), 13=1pm (afternoon), 19=7pm (evening)
+	periods := []struct {
+		label string
+		hour  int
+	}{
+		{"Morning", 8},
+		{"Afternoon", 13},
+		{"Evening", 19},
+	}
+
+	var sb strings.Builder
+
+	fmt.Fprintf(&sb, "%s %s: %.0f°C to %.0f°C\n", emoji, name,
+		data.Daily.TemperatureMin[0], data.Daily.TemperatureMax[0])
+
+	for _, p := range periods {
+		pEmoji := weatherCodeToEmoji(data.Hourly.WeatherCode[p.hour])
+		pCondition := weatherCodeToDescription(data.Hourly.WeatherCode[p.hour])
+		fmt.Fprintf(&sb, "  %s: %s %s, %.0f°C\n", p.label, pEmoji, pCondition, data.Hourly.Temperature[p.hour])
+	}
+
+	fmt.Fprintf(&sb, "  Wind: up to %.0f km/h | Rain: %d%% chance",
+		data.Daily.WindSpeedMax[0], data.Daily.PrecipitationProbMax[0])
+
+	return sb.String()
 }
 
 func weatherCodeToDescription(code int) string {
