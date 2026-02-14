@@ -67,6 +67,23 @@ func TestQueueSlackNotificationDeduplicates(t *testing.T) {
 	assert.Equal(t, []string{"duplicate", "unique"}, messages)
 }
 
+func TestWeatherNotification(t *testing.T) {
+	db, cleanup := setupTestDB(t)
+	defer cleanup()
+
+	// Not notified yet
+	assert.False(t, db.HasWeatherBeenNotifiedToday("Manchester"))
+
+	// Mark as notified
+	db.SetWeatherNotified("Manchester")
+
+	// Now it should be true
+	assert.True(t, db.HasWeatherBeenNotifiedToday("Manchester"))
+
+	// Different location should still be false
+	assert.False(t, db.HasWeatherBeenNotifiedToday("London"))
+}
+
 func TestExec(t *testing.T) {
 	db, cleanup := setupTestDB(t)
 	defer cleanup()

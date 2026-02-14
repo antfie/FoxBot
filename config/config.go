@@ -75,6 +75,14 @@ type yamlConfig struct {
 			Hash                       string   `yaml:"hash"`
 		} `yaml:"sites"`
 	} `yaml:"site_changes"`
+	Weather *struct {
+		Check     yamlTimeCheck `yaml:"check"`
+		Locations []struct {
+			Name      string  `yaml:"name"`
+			Latitude  float64 `yaml:"latitude"`
+			Longitude float64 `yaml:"longitude"`
+		} `yaml:"locations"`
+	} `yaml:"weather"`
 }
 
 func Load(defaultConfigData []byte) *types.Config {
@@ -132,6 +140,7 @@ func parseConfigFile(configFilePath string) *types.Config {
 		Countdown:   parseCountdown(config),
 		RSS:         parseRSS(config),
 		SiteChanges: parseSiteChanges(config),
+		Weather:     parseWeather(config),
 	}
 }
 
@@ -239,6 +248,27 @@ func parseSiteChanges(config *yamlConfig) *types.SiteChange {
 	return &types.SiteChange{
 		Check: parseTimeCheck(config.SiteChanges.Check),
 		Sites: sites,
+	}
+}
+
+func parseWeather(config *yamlConfig) *types.Weather {
+	if config.Weather == nil {
+		return nil
+	}
+
+	locations := make([]types.WeatherLocation, len(config.Weather.Locations))
+
+	for i, x := range config.Weather.Locations {
+		locations[i] = types.WeatherLocation{
+			Name:      x.Name,
+			Latitude:  x.Latitude,
+			Longitude: x.Longitude,
+		}
+	}
+
+	return &types.Weather{
+		Check:     parseTimeCheck(config.Weather.Check),
+		Locations: locations,
 	}
 }
 

@@ -9,6 +9,7 @@ type Config struct {
 	Countdown           *Countdown
 	RSS                 *RSS
 	SiteChanges         *SiteChange
+	Weather             *Weather
 }
 
 type Output struct {

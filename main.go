@@ -103,6 +103,14 @@ func main() {
 		}
 	}
 
+	if c.Weather != nil {
+		if len(c.Weather.Locations) < 1 {
+			log.Print("No weather locations configured.")
+		} else {
+			tasksToRun = append(tasksToRun, tasks.NewTask(c.Weather.Check.Frequency, task.Weather))
+		}
+	}
+
 	if len(tasksToRun) == 0 {
 		log.Print("Error: No tasks to run.")
 		os.Exit(1)

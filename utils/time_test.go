@@ -69,6 +69,8 @@ func TestParseDurationFromString(t *testing.T) {
 	assert.Equal(t, time.Hour, ParseDurationFromString("Hourly"))
 	assert.Equal(t, 30*time.Minute, ParseDurationFromString("half_hourly"))
 	assert.Equal(t, 30*time.Minute, ParseDurationFromString("Half_Hourly"))
+	assert.Equal(t, 24*time.Hour, ParseDurationFromString("daily"))
+	assert.Equal(t, 24*time.Hour, ParseDurationFromString("Daily"))
 }
 
 func TestIsWithinDuration(t *testing.T) {

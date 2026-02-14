@@ -66,6 +66,10 @@ func ParseDurationFromString(d string) time.Duration {
 		return time.Minute * 30
 	}
 
+	if strings.ToLower(d) == "daily" {
+		return time.Hour * 24
+	}
+
 	log.Panic("Invalid duration")
 	return time.Hour
 }

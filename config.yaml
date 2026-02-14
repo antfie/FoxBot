@@ -43,6 +43,13 @@ output:
     from: 08:00
     to: 18:00
 
+# Each feature below has a "check" section that controls how often it runs:
+#   frequency: how often the task runs (hourly, half_hourly, or daily)
+#   from/to:   optional time window (HH:MM) - the task only acts within this window.
+#              If omitted, the task runs at any time of day.
+#              Use "hourly" with a time window for once-a-day features like weather,
+#              as "daily" fires at midnight which may fall outside your window.
+
 # Enable this for inspiration to help you keep your goals on track
 reminders:
   # How often to be reminded?
@@ -98,3 +105,17 @@ rss:
   - feeds:
       - name: xkcd
         url: https://xkcd.com/rss.xml
+
+# Get daily weather forecasts for your locations
+# Uses Open-Meteo API (free, no API key required)
+# Uses hourly frequency with a morning time window so you get one notification per day.
+# The DB prevents duplicate notifications if FoxBot restarts within the same day.
+weather:
+  check:
+    frequency: hourly
+    from: 07:00
+    to: 09:00
+  locations:
+  - name: Manchester
+    latitude: 53.478124
+    longitude: -2.244696

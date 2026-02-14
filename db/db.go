@@ -392,6 +392,27 @@ func (db *DB) IncrementHTTPCacheFailCount(url string) int {
 	return failCount
 }
 
+// Weather methods
+
+func (db *DB) HasWeatherBeenNotifiedToday(location string) bool {
+	db.mu.Lock()
+	defer db.mu.Unlock()
+
+	row := db.db.QueryRow("SELECT 1 FROM weather_notification WHERE location = ? AND last_notified = date('now')", location)
+
+	var dummy int
+	err := row.Scan(&dummy)
+
+	return err == nil
+}
+
+func (db *DB) SetWeatherNotified(location string) {
+	db.mu.Lock()
+	defer db.mu.Unlock()
+
+	db.insert("INSERT INTO weather_notification (location, last_notified) VALUES (?, date('now')) ON CONFLICT(location) DO UPDATE SET last_notified = date('now')", location)
+}
+
 func (db *DB) ConsumeSlackNotificationQueue() []string {
 	db.mu.Lock()
 	defer db.mu.Unlock()
