@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"regexp"
+	"slices"
 	"strconv"
 	"strings"
 )
@@ -25,21 +26,11 @@ func StringContainsWordIgnoreCase(value string, array []string) string {
 	return ""
 }
 
-func IsStringInArray(value string, array []string) bool {
-	for _, element := range array {
-		if element == value {
-			return true
-		}
-	}
-
-	return false
-}
-
 func MergeStringArrays(a, b []string) []string {
 	output := a
 
 	for _, x := range b {
-		if !IsStringInArray(x, output) {
+		if !slices.Contains(output, x) {
 			output = append(output, x)
 		}
 	}

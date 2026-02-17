@@ -2,8 +2,8 @@ package db
 
 import (
 	"database/sql"
-	"github.com/antfie/FoxBot/utils"
 	"log"
+	"slices"
 	"sync"
 
 	_ "modernc.org/sqlite"
@@ -151,7 +151,7 @@ func (db *DB) ConsumeTelegramNotificationQueue() []string {
 			continue
 		}
 
-		if !utils.IsStringInArray(value, results) {
+		if !slices.Contains(results, value) {
 			results = append(results, value)
 		}
 	}
@@ -435,7 +435,7 @@ func (db *DB) ConsumeSlackNotificationQueue() []string {
 			continue
 		}
 
-		if !utils.IsStringInArray(value, results) {
+		if !slices.Contains(results, value) {
 			results = append(results, value)
 		}
 	}

@@ -1,8 +1,9 @@
 package utils
 
 import (
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestStringContainsWordIgnoreCase(t *testing.T) {
@@ -20,18 +21,6 @@ func TestStringContainsWordIgnoreCaseNoMatch(t *testing.T) {
 func TestStringContainsWordIgnoreCaseEmptyArray(t *testing.T) {
 	result := StringContainsWordIgnoreCase("anything", []string{})
 	assert.Equal(t, "", result)
-}
-
-func TestIsStringInArray(t *testing.T) {
-	arr := []string{"a", "b", "c"}
-	assert.True(t, IsStringInArray("b", arr))
-	assert.False(t, IsStringInArray("d", arr))
-	assert.False(t, IsStringInArray("B", arr))
-}
-
-func TestIsStringInArrayEmpty(t *testing.T) {
-	assert.False(t, IsStringInArray("a", []string{}))
-	assert.False(t, IsStringInArray("a", nil))
 }
 
 func TestMergeStringArrays(t *testing.T) {

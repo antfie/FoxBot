@@ -39,7 +39,7 @@ func checkForUpdates() {
 		return
 	}
 
-	var response map[string]interface{}
+	var response map[string]any
 
 	err = json.Unmarshal(body, &response)
 

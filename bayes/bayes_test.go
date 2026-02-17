@@ -44,10 +44,10 @@ func TestClassifierIsReadyAfterTraining(t *testing.T) {
 	d := setupTestDB(t)
 	c := NewClassifier(d)
 
-	for i := 0; i < 20; i++ {
+	for range 20 {
 		c.Train("test", "relevant security article about npm malware", true)
 	}
-	for i := 0; i < 10; i++ {
+	for range 10 {
 		c.Train("test", "irrelevant sports football match results", false)
 	}
 
@@ -74,7 +74,7 @@ func TestClassifierTrainAndScore(t *testing.T) {
 	c := NewClassifier(d)
 
 	// Train with security-related content as relevant
-	for i := 0; i < 15; i++ {
+	for range 15 {
 		c.Train("security", "critical npm malware package detected supply chain attack", true)
 		c.Train("security", "football match results weather forecast celebrity gossip", false)
 	}
@@ -92,7 +92,7 @@ func TestClassifierSeparateFeedGroups(t *testing.T) {
 	d := setupTestDB(t)
 	c := NewClassifier(d)
 
-	for i := 0; i < 15; i++ {
+	for range 15 {
 		c.Train("security", "malware detected in npm package", true)
 		c.Train("security", "weather forecast sunny today", false)
 	}
@@ -111,7 +111,7 @@ func TestClassifierUnseenWords(t *testing.T) {
 	d := setupTestDB(t)
 	c := NewClassifier(d)
 
-	for i := 0; i < 15; i++ {
+	for range 15 {
 		c.Train("test", "security vulnerability found", true)
 		c.Train("test", "sports results today", false)
 	}
