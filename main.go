@@ -69,6 +69,10 @@ func main() {
 		task.Telegram = integrations.NewTelegram(c.Output.Telegram, task.DB, task.Bayes)
 	}
 
+	if c.Output.Discord != nil {
+		task.Discord = integrations.NewDiscord(c.Output.Discord, task.DB)
+	}
+
 	var tasksToRun []*tasks.Task
 
 	if c.Reminders != nil {

@@ -16,6 +16,7 @@ type Output struct {
 	Console  bool
 	Slack    *Slack
 	Telegram *Telegram
+	Discord  *Discord
 }
 
 type Slack struct {
@@ -28,4 +29,9 @@ type Telegram struct {
 	Token    string
 	ChatID   string
 	Duration *TimeDuration
+}
+
+type Discord struct {
+	WebhookURL string
+	Duration   *TimeDuration
 }

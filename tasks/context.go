@@ -12,5 +12,6 @@ type Context struct {
 	DB       *db.DB
 	Slack    *integrations.Slack
 	Telegram *integrations.Telegram
+	Discord  *integrations.Discord
 	Bayes    *bayes.Classifier
 }

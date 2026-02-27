@@ -14,6 +14,10 @@ func (c *Context) Notify(message string) {
 	if c.Config.Output.Telegram != nil {
 		c.DB.QueueTelegramNotification(message)
 	}
+
+	if c.Config.Output.Discord != nil {
+		c.DB.QueueDiscordNotification(message)
+	}
 }
 
 func (c *Context) NotifyGood(message string) {
@@ -28,6 +32,10 @@ func (c *Context) NotifyGood(message string) {
 	if c.Config.Output.Telegram != nil {
 		c.DB.QueueTelegramNotification(message)
 	}
+
+	if c.Config.Output.Discord != nil {
+		c.DB.QueueDiscordNotification(message)
+	}
 }
 
 func (c *Context) NotifyBad(message string) {
@@ -41,5 +49,9 @@ func (c *Context) NotifyBad(message string) {
 
 	if c.Config.Output.Telegram != nil {
 		c.DB.QueueTelegramNotification(message)
+	}
+
+	if c.Config.Output.Discord != nil {
+		c.DB.QueueDiscordNotification(message)
 	}
 }

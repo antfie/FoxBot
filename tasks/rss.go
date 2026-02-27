@@ -157,6 +157,10 @@ func (c *Context) notifyRSS(message, feedGroup, link string, isGood, keywordOnly
 		c.DB.QueueSlackNotification(message)
 	}
 
+	if c.Discord != nil && (!keywordOnly || isGood) {
+		c.DB.QueueDiscordNotification(message)
+	}
+
 	if c.Telegram != nil {
 		hash := articleHash(link)
 		c.DB.BayesSaveArticle(hash, feedGroup, message)

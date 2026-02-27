@@ -67,6 +67,39 @@ func TestQueueSlackNotificationDeduplicates(t *testing.T) {
 	assert.Equal(t, []string{"duplicate", "unique"}, messages)
 }
 
+func TestQueueAndConsumeDiscordNotifications(t *testing.T) {
+	db, cleanup := setupTestDB(t)
+	defer cleanup()
+
+	// Empty queue
+	messages := db.ConsumeDiscordNotificationQueue()
+	assert.Empty(t, messages)
+
+	// Queue messages
+	db.QueueDiscordNotification("hello")
+	db.QueueDiscordNotification("world")
+
+	// Consume returns all messages
+	messages = db.ConsumeDiscordNotificationQueue()
+	assert.Equal(t, []string{"hello", "world"}, messages)
+
+	// Queue is now empty
+	messages = db.ConsumeDiscordNotificationQueue()
+	assert.Empty(t, messages)
+}
+
+func TestQueueDiscordNotificationDeduplicates(t *testing.T) {
+	db, cleanup := setupTestDB(t)
+	defer cleanup()
+
+	db.QueueDiscordNotification("duplicate")
+	db.QueueDiscordNotification("duplicate")
+	db.QueueDiscordNotification("unique")
+
+	messages := db.ConsumeDiscordNotificationQueue()
+	assert.Equal(t, []string{"duplicate", "unique"}, messages)
+}
+
 func TestWeatherNotification(t *testing.T) {
 	db, cleanup := setupTestDB(t)
 	defer cleanup()

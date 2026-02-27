@@ -34,6 +34,11 @@ type yamlConfig struct {
 			From   string `yaml:"from"`
 			To     string `yaml:"to"`
 		} `yaml:"telegram"`
+		Discord *struct {
+			WebhookURL string `yaml:"webhook_url"`
+			From       string `yaml:"from"`
+			To         string `yaml:"to"`
+		} `yaml:"discord"`
 	} `yaml:"output"`
 	Reminders *struct {
 		Check     yamlTimeCheck `yaml:"check"`
@@ -135,6 +140,7 @@ func parseConfigFile(configFilePath string) *types.Config {
 			Console:  config.Output.Console,
 			Slack:    parseSlack(config),
 			Telegram: parseTelegram(config),
+			Discord:  parseDiscord(config),
 		},
 		Reminders:   parseReminders(config),
 		Countdown:   parseCountdown(config),
@@ -165,6 +171,17 @@ func parseTelegram(config *yamlConfig) *types.Telegram {
 		Token:    config.Output.Telegram.Token,
 		ChatID:   config.Output.Telegram.ChatID,
 		Duration: parseDuration(config.Output.Telegram.From, config.Output.Telegram.To),
+	}
+}
+
+func parseDiscord(config *yamlConfig) *types.Discord {
+	if config.Output.Discord == nil {
+		return nil
+	}
+
+	return &types.Discord{
+		WebhookURL: config.Output.Discord.WebhookURL,
+		Duration:   parseDuration(config.Output.Discord.From, config.Output.Discord.To),
 	}
 }
 

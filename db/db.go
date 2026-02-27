@@ -413,6 +413,65 @@ func (db *DB) SetWeatherNotified(location string) {
 	db.insert("INSERT INTO weather_notification (location, last_notified) VALUES (?, date('now')) ON CONFLICT(location) DO UPDATE SET last_notified = date('now')", location)
 }
 
+func (db *DB) QueueDiscordNotification(message string) {
+	db.mu.Lock()
+	defer db.mu.Unlock()
+
+	success := db.insert("INSERT INTO discord_notification(message) VALUES (?)", message)
+
+	if !success {
+		log.Print("Could not queue discord notification")
+	}
+}
+
+func (db *DB) ConsumeDiscordNotificationQueue() []string {
+	db.mu.Lock()
+	defer db.mu.Unlock()
+
+	var results []string
+
+	rows, err := db.db.Query("SELECT message FROM discord_notification ORDER BY created")
+
+	if err != nil {
+		log.Print(err)
+		return results
+	}
+
+	for rows.Next() {
+		var value string
+		err = rows.Scan(&value)
+
+		if err != nil {
+			log.Print(err)
+			continue
+		}
+
+		if !slices.Contains(results, value) {
+			results = append(results, value)
+		}
+	}
+
+	err = rows.Err()
+
+	if err != nil {
+		log.Print(err)
+	}
+
+	err = rows.Close()
+
+	if err != nil {
+		log.Print(err)
+	}
+
+	_, err = db.db.Exec("DELETE FROM discord_notification")
+
+	if err != nil {
+		log.Print(err)
+	}
+
+	return results
+}
+
 func (db *DB) ConsumeSlackNotificationQueue() []string {
 	db.mu.Lock()
 	defer db.mu.Unlock()
